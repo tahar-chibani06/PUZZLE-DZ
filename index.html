@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JigSolitaire Web - Prototype</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --card-color: #ecf0f1;
+            --accent-color: #27ae60;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        h1 { margin-bottom: 10px; }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+        }
+
+        /* --- Zone Solitaire (Gauche) --- */
+        .solitaire-zone {
+            flex: 1;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #7f8c8d;
+        }
+
+        .card-deck {
+            width: 100px;
+            height: 140px;
+            background: linear-gradient(135deg, #c0392b 25%, #e74c3c 25%, #e74c3c 50%, #c0392b 50%, #c0392b 75%, #e74c3c 75%, #e74c3c 100%);
+            background-size: 20px 20px;
+            border-radius: 8px;
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s;
+        }
+
+        .card-deck:active { transform: scale(0.95); }
+
+        .message-box {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        /* --- Zone Puzzle (Droite) --- */
+        .puzzle-zone {
+            flex: 2;
+            background: #34495e;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #7f8c8d;
+        }
+
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(2, 100px);
+            grid-template-rows: repeat(2, 100px);
+            gap: 2px;
+            margin-bottom: 20px;
+            background: #000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .puzzle-slot {
+            width: 100px;
+            height: 100px;
+            background-color: #2c3e50;
+            border: 1px dashed #7f8c8d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            font-size: 2em;
+        }
+
+        .inventory {
+            display: flex;
+            gap: 10px;
+            height: 110px;
+            width: 100%;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .puzzle-piece {
+            width: 90px;
+            height: 90px;
+            background-size: 200px 200px; /* Taille totale de l'image puzzle */
+            cursor: grab;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Simulation d'une image (ici un dégradé ou une image placeholder) */
+        .piece-1 { background-image: url('https://picsum.photos/id/10/200/200'); background-position: 0 0; }
+        .piece-2 { background-image: url('https://picsum.photos/id/10/200/200'); background-position: -100px 0; }
+        .piece-3 { background-image: url('https://picsum.photos/id/10/200/200'); background-position: 0 -100px; }
+        .piece-4 { background-image: url('https://picsum.photos/id/10/200/200'); background-position: -100px -100px; }
+
+        .hidden { display: none; }
+
+        button.reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #e67e22;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>JigSolitaire Demo</h1>
+    <p>Cliquez sur le Deck pour "Gagner" une main et débloquer une pièce.</p>
+
+    <div class="game-container">
+        <div class="solitaire-zone">
+            <h3>Solitaire</h3>
+            <div class="card-deck" id="deck" onclick="playSolitaire()">
+                <span style="font-size: 2em; color: white;">♠</span>
+            </div>
+            <div class="message-box" id="msg-box">Cliquez pour jouer...</div>
+        </div>
+
+        <div class="puzzle-zone">
+            <h3>Puzzle Collection</h3>
+            <div class="puzzle-board">
+                <div class="puzzle-slot" data-id="1" ondrop="drop(event)" ondragover="allowDrop(event)">1</div>
+                <div class="puzzle-slot" data-id="2" ondrop="drop(event)" ondragover="allowDrop(event)">2</div>
+                <div class="puzzle-slot" data-id="3" ondrop="drop(event)" ondragover="allowDrop(event)">3</div>
+                <div class="puzzle-slot" data-id="4" ondrop="drop(event)" ondragover="allowDrop(event)">4</div>
+            </div>
+            
+            <div class="inventory" id="inventory">
+                </div>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="location.reload()">Réinitialiser</button>
+
+    <script>
+        // État du jeu
+        let piecesUnlocked = 0;
+        const totalPieces = 4;
+
+        // Fonction simulée : Jouer au solitaire
+        function playSolitaire() {
+            if(piecesUnlocked >= totalPieces) {
+                document.getElementById('msg-box').innerText = "Puzzle complet !";
+                return;
+            }
+
+            // Simulation : 50% de chance de gagner une pièce
+            const win = Math.random() > 0.1; // Pour la démo, on gagne presque toujours
+            
+            if (win) {
+                piecesUnlocked++;
+                unlockPiece(piecesUnlocked);
+                document.getElementById('msg-box').innerText = "Gagné ! Pièce #" + piecesUnlocked + " débloquée.";
+                document.getElementById('msg-box').style.color = "#2ecc71";
+            } else {
+                document.getElementById('msg-box').innerText = "Perdu... Réessayez.";
+                document.getElementById('msg-box').style.color = "#e74c3c";
+            }
+        }
+
+        // Création de la pièce dans l'inventaire
+        function unlockPiece(id) {
+            const inventory = document.getElementById('inventory');
+            const piece = document.createElement('div');
+            
+            piece.classList.add('puzzle-piece');
+            piece.classList.add('piece-' + id);
+            piece.draggable = true;
+            piece.id = "p-" + id;
+            piece.dataset.id = id; // Stocke l'ID cible
+
+            // Événement Drag Start
+            piece.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData("text", e.target.id);
+                e.dataTransfer.setData("targetId", e.target.dataset.id);
+            });
+
+            inventory.appendChild(piece);
+        }
+
+        // Drag & Drop Logic
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const pieceId = ev.dataTransfer.getData("text");
+            const targetIdOfPiece = ev.dataTransfer.getData("targetId");
+            
+            // L'élément sur lequel on lâche (le slot)
+            const slot = ev.target;
+
+            // Vérification : Est-ce le bon slot ?
+            // On vérifie si le slot a la classe puzzle-slot et si son ID correspond
+            if (slot.classList.contains('puzzle-slot')) {
+                if (slot.dataset.id === targetIdOfPiece) {
+                    const piece = document.getElementById(pieceId);
+                    slot.innerHTML = ""; // Enlève le chiffre
+                    slot.appendChild(piece); // Déplace la pièce
+                    piece.draggable = false; // Verrouille la pièce
+                    piece.style.cursor = 'default';
+                    slot.style.border = "none";
+                } else {
+                    alert("Ce n'est pas la bonne place !");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
