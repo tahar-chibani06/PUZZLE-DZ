@@ -30,13 +30,17 @@
             touch-action: none;
         }
 
-        /* --- SPLASH SCREEN --- */
-        #splash-screen {
+        /* --- UI GÉNÉRALE --- */
+        .screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-gradient);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 0.5s ease;
+            display: flex; flex-direction: column;
+            z-index: 100; transition: opacity 0.4s ease, transform 0.4s ease;
         }
+        .screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); z-index: -1; }
+
+        /* Splash */
+        #splash-screen { justify-content: center; align-items: center; z-index: 200; }
         .title-dz {
             font-size: 3rem; font-weight: 900;
             background: linear-gradient(90deg, var(--accent-color) 30%, #ffffff 50%, var(--accent-red) 70%);
@@ -50,17 +54,37 @@
             color: white; background: var(--accent-gradient); border: none; border-radius: 50px;
             cursor: pointer; box-shadow: 0 0 20px rgba(0, 153, 51, 0.4);
         }
-        .footer-credit {
-            position: absolute; bottom: 20px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 1px; text-transform: uppercase; font-weight: 700;
-        }
+        .footer-credit { position: absolute; bottom: 20px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; font-weight: 700; }
         .footer-credit span { color: var(--accent-red); }
 
-        /* --- JEU UI --- */
+        /* Level Select */
+        #level-select-screen { align-items: center; padding-top: 20px; overflow-y: auto; }
+        .level-header { font-size: 1.5rem; color: var(--accent-color); font-weight: 800; margin-bottom: 20px; letter-spacing: 2px; }
+        .level-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 90%; max-width: 600px; padding-bottom: 50px; }
+        .level-card {
+            aspect-ratio: 1 / 1; background: #000; border-radius: 12px;
+            border: 2px solid var(--glass-border); position: relative; overflow: hidden;
+            cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .level-card:active { transform: scale(0.95); }
+        .level-card.locked { border-color: var(--accent-red); opacity: 0.7; }
+        .level-card.locked .card-img { filter: blur(8px) grayscale(80%); }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.3);
+        }
+        .card-number { font-size: 2rem; font-weight: 900; color: white; text-shadow: 0 2px 10px black; }
+        .lock-icon { width: 40px; fill: var(--accent-red); filter: drop-shadow(0 0 5px black); }
+
+        /* Game Area */
         header {
             height: 60px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--glass-border);
-            z-index: 10;
+            padding: 0 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .btn-menu {
+            background: transparent; border: 1px solid var(--glass-border); color: #ccc;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
         }
         .level-badge {
             background: rgba(0, 153, 51, 0.2); border: 1px solid var(--accent-color);
@@ -69,64 +93,79 @@
         .btn-eye {
             background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white;
             width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer;
         }
-        .btn-eye:active { background: var(--accent-color); }
-        .btn-eye svg { width: 20px; height: 20px; fill: white; }
+        .btn-eye svg { width: 20px; fill: white; }
 
         .game-area {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            width: 100%; position: relative;
+            width: 100%; position: relative; padding: 20px; box-sizing: border-box;
         }
 
         .puzzle-board {
             display: grid; gap: 0;
-            background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.1);
-            box-shadow: 0 0 50px rgba(0, 153, 51, 0.1);
+            /* Pas de fond visible, juste la structure */
             position: relative; 
         }
 
-        .puzzle-slot {
-            width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 8px 8px;
+        /* Le slot est juste un repère de grille */
+        .puzzle-slot { 
+            width: 100%; height: 100%; position: relative; pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05); /* Grille très légère */
         }
 
+        /* --- PIÈCES JIGSAW SVG --- */
         .puzzle-piece {
-            width: 100%; height: 100%;
+            /* La pièce est plus grande que le slot pour les bosses */
+            width: 130%; height: 130%;
+            position: absolute; top: -15%; left: -15%;
             cursor: grab;
-            background-repeat: no-repeat;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-            box-sizing: border-box;
-            position: relative; z-index: 1;
+            z-index: 10;
             transition: transform 0.1s ease-out;
+            /* Le drop-shadow s'applique à la forme SVG exacte */
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+            pointer-events: auto; /* Réactive les clics */
         }
 
-        /* Dragging = Rouge Algérien */
-        .puzzle-piece.dragging {
-            z-index: 1000 !important;
-            transition: none !important; 
-            opacity: 0.95;
-            box-shadow: 0 0 0 2px var(--accent-red), 0 0 20px rgba(214, 0, 0, 0.4) !important;
-            transform: scale(1.05);
-        }
-
-        /* Locked = Vert Algérien */
-        .puzzle-piece.locked {
-            cursor: default !important; 
-            box-shadow: none !important; 
-            z-index: 0; 
+        /* L'élément SVG à l'intérieur */
+        .puzzle-piece svg {
+            width: 100%; height: 100%;
+            overflow: visible;
         }
         
-        @keyframes lockFlash {
-            0% { filter: brightness(1); }
-            50% { filter: brightness(1.5) sepia(1) hue-rotate(90deg) saturate(5); box-shadow: 0 0 30px var(--lock-color); }
-            100% { filter: brightness(1); box-shadow: none; }
+        /* Contour de la pièce */
+        .puzzle-piece path {
+            fill: none;
+            stroke: rgba(255,255,255,0.4);
+            stroke-width: 1px;
+            vector-effect: non-scaling-stroke;
         }
-        .just-locked { animation: lockFlash 0.6s ease-out; }
 
+        /* Dragging */
+        .puzzle-piece.dragging {
+            z-index: 1000 !important; transition: none;
+            transform: scale(1.1);
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.6));
+        }
+        /* La bordure devient rouge en drag */
+        .puzzle-piece.dragging path { stroke: var(--accent-red); stroke-width: 2px; }
 
-        /* --- MODALES --- */
+        /* Locked */
+        .puzzle-piece.locked {
+            cursor: default !important; z-index: 1;
+            filter: none; /* On enlève l'ombre pour aplatir */
+        }
+        /* On enlève le trait de contour quand c'est verrouillé pour que l'image soit unie */
+        .puzzle-piece.locked path { stroke: none; }
+
+        /* Flash */
+        @keyframes lockFlash {
+            0% { filter: brightness(2) drop-shadow(0 0 10px var(--lock-color)); }
+            100% { filter: none; }
+        }
+        .just-locked { animation: lockFlash 0.5s ease-out; }
+
+        /* Modales */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); z-index: 5000;
@@ -134,61 +173,27 @@
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        
-        /* Contenu Modale */
         .modal-content {
-            max-width: 90%; max-height: 80%; 
-            border: 1px solid var(--accent-color);
-            border-radius: 12px; 
-            box-shadow: 0 0 40px rgba(0, 153, 51, 0.2); 
-            background: #121a15; 
-            overflow: hidden; transform: scale(0.9); transition: transform 0.3s;
+            max-width: 90%; max-height: 80%; border: 1px solid var(--accent-color);
+            border-radius: 12px; box-shadow: 0 0 40px rgba(0, 153, 51, 0.2); 
+            background: #121a15; overflow: hidden; transform: scale(0.9); transition: transform 0.3s;
             display: flex; flex-direction: column; align-items: center;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-img { display: block; max-width: 100%; max-height: 70vh; object-fit: contain; }
 
-        /* --- FENÊTRE RÉCOMPENSE --- */
-        .story-container { 
-            padding: 25px; text-align: center; color: white; width: 90%; max-width: 550px; 
-            max-height: 90vh; overflow-y: auto; 
-        }
-        
-        .reward-image-container {
-            margin: 20px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid var(--accent-red);
-            box-shadow: 0 0 30px rgba(214, 0, 0, 0.3);
-            animation: rewardPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        @keyframes rewardPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
+        /* Story */
+        .story-container { padding: 25px; text-align: center; color: white; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
+        .reward-image-container { margin: 20px 0; border-radius: 8px; overflow: hidden; border: 2px solid var(--accent-red); box-shadow: 0 0 30px rgba(214, 0, 0, 0.3); }
         .reward-img { width: 100%; height: auto; display: block; }
-
-        .story-title { color: var(--accent-color); font-size: 1.4rem; margin: 10px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;}
-        .story-location { color: #aaaaaa; font-size: 1rem; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; font-weight: 700;}
-        
-        /* Modification : Texte non italique et plus aéré */
-        .story-text { 
-            font-size: 1rem; 
-            line-height: 1.6; 
-            color: #e0e0e0; 
-            margin-bottom: 30px; 
-            text-align: justify; /* Justifié pour faire plus "bloc de texte" */
-        }
-        
+        .story-title { color: var(--accent-color); font-size: 1.4rem; margin: 10px 0; font-weight: 900;}
+        .story-location { color: #aaaaaa; font-size: 1rem; margin-bottom: 20px; font-weight: 700;}
+        .story-text { font-size: 1rem; line-height: 1.6; color: #e0e0e0; margin-bottom: 30px; text-align: justify; }
         .btn-continue {
             padding: 12px 40px; background: var(--accent-gradient); color: white;
-            border: none; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0, 153, 51, 0.4); width: 100%;
+            border: none; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%;
         }
 
-        /* Btn Victoire */
         .btn-next {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             padding: 12px 40px; background: var(--accent-gradient); color: white; border: none; border-radius: 50px;
@@ -202,27 +207,35 @@
 </head>
 <body>
 
-    <div id="splash-screen">
+    <div id="splash-screen" class="screen">
         <div class="logo-container">
             <h1 class="title-dz">PUZZLE DZ</h1>
             <p class="subtitle">DÉCOUVREZ LES TRÉSORS D'ALGÉRIE</p>
         </div>
-        <button class="btn-start" onclick="startGame()">JOUER</button>
+        <button class="btn-start" onclick="goToLevelSelect()">JOUER</button>
         <div class="footer-credit">Created by : <span>ASSSIREM MEDIA</span></div>
     </div>
 
-    <header id="game-header" class="hidden">
-        <div class="level-badge" id="level-indicator">NIVEAU 1</div>
-        <button class="btn-eye" onclick="openRefModal()">
-            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-        </button>
-    </header>
-
-    <div class="game-area hidden" id="game-area">
-        <div id="board" class="puzzle-board"></div>
+    <div id="level-select-screen" class="screen hidden">
+        <div class="level-header">VOS DESTINATIONS</div>
+        <div class="level-grid" id="level-grid"></div>
     </div>
 
-    <button id="btn-next" class="btn-next" onclick="openRewardModal()">NIVEAU TERMINÉ ➜</button>
+    <div id="game-screen" class="screen hidden">
+        <header id="game-header">
+            <button class="btn-menu" onclick="goToLevelSelect()">☰ MENU</button>
+            <div class="level-badge" id="level-indicator">NIVEAU 1</div>
+            <button class="btn-eye" onclick="openRefModal()">
+                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+        </header>
+
+        <div class="game-area" id="game-area">
+            <div id="board" class="puzzle-board"></div>
+        </div>
+
+        <button id="btn-next" class="btn-next" onclick="openRewardModal()">NIVEAU TERMINÉ ➜</button>
+    </div>
 
     <div id="ref-modal" class="modal-overlay" onclick="closeRefModal(event)">
         <div class="modal-content">
@@ -234,156 +247,101 @@
         <div class="modal-content story-container">
             <h2 class="story-title" id="story-title">Titre</h2>
             <div class="story-location" id="story-location">Lieu</div>
-            
             <div class="reward-image-container">
                 <img id="reward-img" class="reward-img" src="" alt="Reward">
             </div>
-
             <div class="story-text" id="story-desc"></div>
-
             <button class="btn-continue" onclick="finishStoryAndNext()">NIVEAU SUIVANT ➜</button>
         </div>
     </div>
 
     <script>
-        // --- DONNÉES DES NIVEAUX ENRICHIES (2 Paragraphes) ---
+        // --- DONNÉES ---
         const levelsData = [
-            { 
-                pieces: 12, 
-                title: "CAP CARBON", 
-                location: "BÉJAÏA (KABYLIE)",
-                keyword: "cliff,sea,lighthouse",
-                story: "Surplombant la mer Méditerranée, le Cap Carbon est l'un des sites les plus emblématiques de la côte de Béjaïa. Il est célèbre pour abriter le phare naturel le plus élevé au monde, perché à plus de 220 mètres au-dessus du niveau de la mer, offrant un panorama à couper le souffle.<br><br>Le site fait partie du Parc National de Gouraya, une réserve de biosphère protégée par l'UNESCO. C'est un lieu de prédilection pour les randonneurs qui peuvent y croiser les fameux singes magots, une espèce endémique de la région, tout en admirant les falaises abruptes plongeant dans le bleu azur."
-            },
-            { 
-                pieces: 16, 
-                title: "TASSILI N'AJJER", 
-                location: "DJANET (SAHARA)",
-                keyword: "sahara,rock,arch",
-                story: "Le Tassili n'Ajjer est un immense plateau au sud-est de l'Algérie, véritable musée à ciel ouvert. Il abrite l'une des plus importantes collections d'art rupestre préhistorique au monde, avec plus de 15 000 dessins et gravures racontant l'évolution de la vie humaine dans le Sahara.<br><br>Au-delà de son importance historique, le site est célèbre pour ses paysages lunaires fascinants. L'érosion a sculpté le grès en « forêts de pierre », créant des arches naturelles monumentales, des canyons profonds et des formations rocheuses aux allures de citadelles perdues dans le désert."
-            },
-            { 
-                pieces: 20, 
-                title: "CANYON DE GHOUFI", 
-                location: "BATNA (AURÈS)",
-                keyword: "canyon,valley,village",
-                story: "Surnommé le « Colorado Algérien », le Canyon de Ghoufi est une merveille géologique creusée par l'oued Abiod au cœur du massif des Aurès. Sur une longueur de plusieurs kilomètres, les falaises ocre et dorées s'élèvent de part et d'autre d'une vallée verdoyante.<br><br>Ce qui rend ce lieu unique, ce sont les villages troglodytiques berbères, aujourd'hui abandonnés, accrochés aux parois du canyon. En contrebas, une palmeraie luxuriante serpente le long de la rivière, créant un contraste saisissant entre l'aridité de la roche et la vie de l'oasis."
-            },
-            { 
-                pieces: 24, 
-                title: "TIKJDA", 
-                location: "BOUIRA (DJURDJURA)",
-                keyword: "mountain,snow,forest",
-                story: "Située dans le Parc National du Djurdjura en Kabylie, Tikjda est une station climatique perchée à 1478 mètres d'altitude. Célèbre pour ses forêts denses de cèdres de l'Atlas millénaires, c'est un sanctuaire de biodiversité qui change de visage au fil des saisons.<br><br>En hiver, Tikjda se couvre d'un épais manteau blanc, devenant un paradis pour le ski et les sports d'hiver. En été, ses sentiers offrent des randonnées spectaculaires vers des sommets comme Lalla Khedidja, offrant des vues imprenables sur toute la chaîne montagneuse."
-            },
-            { 
-                pieces: 30, 
-                title: "OASIS DE TAGHIT", 
-                location: "BÉCHAR (SAOURA)",
-                keyword: "oasis,sand,dunes",
-                story: "Considérée comme l'une des plus belles oasis du Sahara, Taghit est la perle de la région de la Saoura. Elle est célèbre pour son vieux ksar (village fortifié) en terre rouge qui surplombe une immense palmeraie longeant l'oued Zousfana.<br><br>Le paysage est dominé par le Grand Erg Occidental et ses dunes dorées majestueuses qui viennent mourir au pied de l'oasis. Taghit est un lieu de quiétude absolue, où l'on peut admirer des couchers de soleil inoubliables sur les dunes et découvrir des gravures rupestres néolithiques."
-            },
-            { 
-                pieces: 35, 
-                title: "GROTTES MERVEILLEUSES", 
-                location: "JIJEL (CORNICHE)",
-                keyword: "cave,underground,stalactite",
-                story: "Nichées dans la corniche jijelienne, les Grottes Merveilleuses sont un chef-d'œuvre souterrain sculpté par l'eau sur des millions d'années. Accessibles au public, elles offrent un spectacle féérique de concrétions calcaires.<br><br>À l'intérieur, la température reste constante et fraîche. Le visiteur déambule entre des stalactites tombant du plafond et des stalagmites s'élevant du sol, formant des sculptures naturelles qui évoquent, avec un peu d'imagination, des statues, des draperies ou des animaux fantastiques, le tout mis en valeur par des jeux de lumière."
-            },
-            { 
-                pieces: 40, 
-                title: "ASSEKREM", 
-                location: "TAMANRASSET (HOGGAR)",
-                keyword: "volcano,mountain,sunrise",
-                story: "L'Assekrem est l'un des sommets les plus emblématiques du massif volcanique du Hoggar. Célèbre pour avoir accueilli l'ermitage du Père Charles de Foucauld en 1911, c'est un lieu chargé de spiritualité et de silence.<br><br>Le site est mondialement connu pour offrir l'un des plus beaux levers et couchers de soleil sur Terre. Depuis son sommet, la vue panoramique sur les pics et aiguilles de phonolite noire qui surgissent du désert est tout simplement irréelle, donnant l'impression d'être sur une autre planète."
-            },
-            { 
-                pieces: 48, 
-                title: "MONT CHENOUA", 
-                location: "TIPAZA (CÔTE CENTRALE)",
-                keyword: "sea,coast,mountain",
-                story: "Le Mont Chenoua est la montagne qui marque l'extrémité ouest de la plaine de la Mitidja avant de plonger directement dans la mer Méditerranée. Culminant à 905 mètres, c'est un massif boisé de chênes-lièges et de pins d'Alep, offrant une fraîcheur bienvenue.<br><br>La route côtière qui contourne le Chenoua offre des panoramas splendides sur la mer turquoise et des criques sauvages. La région est également riche en histoire, située à proximité immédiate des célèbres ruines romaines de Tipasa, classées au patrimoine mondial de l'UNESCO."
-            }
+            { pieces: 12, title: "CAP CARBON", location: "BÉJAÏA", keyword: "cliff,lighthouse", story: "Surplombant la Méditerranée, le Cap Carbon abrite le phare naturel le plus haut du monde.<br><br>Un lieu magique où les singes magots observent les navires passer au loin." },
+            { pieces: 16, title: "TASSILI N'AJJER", location: "DJANET", keyword: "sahara,rock", story: "Un musée à ciel ouvert. Ce paysage lunaire raconte l'histoire de l'humanité à travers ses gravures rupestres millénaires.<br><br>Les formations rocheuses créent une véritable forêt de pierre unique au monde." },
+            { pieces: 20, title: "CANYON DE GHOUFI", location: "BATNA", keyword: "canyon,valley", story: "Surnommé le « Colorado Algérien ». Les balcons du Ghoufi offrent une vue spectaculaire sur l'oued Abiod.<br><br>Les maisons troglodytes accrochées à la falaise témoignent d'un mode de vie ancestral." },
+            { pieces: 24, title: "TIKJDA", location: "BOUIRA", keyword: "mountain,snow", story: "Au cœur du Djurdjura, Tikjda offre des paysages alpins époustouflants.<br><br>Entre forêts de cèdres et sommets enneigés, c'est le paradis des randonneurs et skieurs." },
+            { pieces: 30, title: "OASIS DE TAGHIT", location: "BÉCHAR", keyword: "oasis,dunes", story: "La perle de la Saoura. Des dunes dorées majestueuses qui embrassent une palmeraie verdoyante.<br><br>Le vieux Ksar en terre rouge veille sur l'oued depuis des siècles." },
+            { pieces: 35, title: "GROTTES MERVEILLEUSES", location: "JIJEL", keyword: "cave,stalactite", story: "Un chef-d'œuvre souterrain sculpté par l'eau. Les stalactites forment des sculptures naturelles fascinantes.<br><br>La température y reste fraîche toute l'année, un contraste saisissant avec la chaleur extérieure." },
+            { pieces: 40, title: "ASSEKREM", location: "TAMANRASSET", keyword: "volcano,sunset", story: "Le toit du Sahara. Au lever du soleil, les pics du Hoggar s'embrasent.<br><br>C'est ici que Charles de Foucauld a trouvé la paix absolue, face à l'un des plus beaux panoramas du monde." },
+            { pieces: 48, title: "MONT CHENOUA", location: "TIPAZA", keyword: "sea,mountain", story: "Là où la montagne plonge dans la mer. Un lieu mythique mêlant nature sauvage et histoire.<br><br>La route côtière offre des criques secrètes aux eaux turquoises." }
         ];
 
         let currentLevel = 0;
         let cols = 0, rows = 0;
-        let slotSize = 0;
+        let slotW = 0, slotH = 0;
         let currentImageUrl = "";
+        let maxUnlockedLevel = 0;
         
+        // Formes des pièces (Top, Right, Bottom, Left) - 1:Out, -1:In, 0:Flat
+        let jigsawShapes = []; 
+
         let draggedPiece = null;
         let isDragging = false;
         let startX = 0, startY = 0;
-        
-        function startGame() {
-            document.getElementById('splash-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.display = 'none';
-                document.getElementById('game-header').classList.remove('hidden');
-                document.getElementById('game-area').classList.remove('hidden');
-                loadLevel(currentLevel);
-            }, 500);
+
+        window.onload = () => {
+            const saved = localStorage.getItem('puzzleDZ_progress');
+            if (saved) maxUnlockedLevel = parseInt(saved);
+        };
+
+        function goToLevelSelect() {
+            document.getElementById('splash-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('level-select-screen').classList.remove('hidden');
+            renderLevelGrid();
         }
 
-        window.onresize = () => { if(!document.getElementById('splash-screen').style.display) loadLevel(currentLevel); };
-
-        // --- GESTION DES MODALES ---
-        function openRefModal() {
-            document.getElementById('ref-image').src = currentImageUrl;
-            document.getElementById('ref-modal').classList.add('active');
-        }
-        function closeRefModal(e) {
-            if (e.target.classList.contains('modal-overlay')) document.getElementById('ref-modal').classList.remove('active');
-        }
-
-        // --- GESTION RÉCOMPENSE ---
-        function openRewardModal() {
-            const data = levelsData[currentLevel];
-            document.getElementById('story-title').innerText = data.title;
-            document.getElementById('story-location').innerText = data.location;
-            document.getElementById('reward-img').src = currentImageUrl;
-            // Utilisation de innerHTML pour interpréter les balises <br>
-            document.getElementById('story-desc').innerHTML = data.story;
-            document.getElementById('story-modal').classList.add('active');
+        function renderLevelGrid() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = "";
+            levelsData.forEach((level, index) => {
+                const isLocked = index > maxUnlockedLevel;
+                const card = document.createElement('div');
+                card.className = `level-card ${isLocked ? 'locked' : 'unlocked'}`;
+                const thumbUrl = `https://loremflickr.com/300/300/${level.keyword}?random=${index}`;
+                let content = `<img src="${thumbUrl}" class="card-img">`;
+                if (isLocked) {
+                    content += `<div class="card-overlay"><svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>`;
+                } else {
+                    content += `<div class="card-overlay"><div class="card-number">${index + 1}</div></div>`;
+                    card.onclick = () => loadLevel(index);
+                }
+                card.innerHTML = content;
+                grid.appendChild(card);
+            });
         }
 
-        function finishStoryAndNext() {
-            document.getElementById('story-modal').classList.remove('active');
-            currentLevel++;
-            loadLevel(currentLevel);
-        }
-
-        // --- CHARGEMENT NIVEAU ---
         function loadLevel(index) {
-            if (index >= levelsData.length) { 
-                alert("Félicitations ! Vous avez exploré toute l'Algérie !"); 
-                location.reload(); 
-                return; 
-            }
-
+            currentLevel = index;
             const data = levelsData[index];
+            document.getElementById('level-select-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
             const board = document.getElementById('board');
             const area = document.getElementById('game-area');
-            
             board.innerHTML = "";
             document.getElementById('btn-next').style.display = "none";
             document.getElementById('level-indicator').innerText = `NIVEAU ${index + 1}`;
-            board.style.borderColor = "rgba(255,255,255,0.1)";
 
             const w = area.clientWidth;
             const h = area.clientHeight;
             const grid = calcGrid(data.pieces, w, h);
             cols = grid.cols; rows = grid.rows;
 
-            slotSize = Math.floor(Math.min((w * 0.95) / cols, (h * 0.95) / rows));
+            slotW = Math.floor(Math.min((w * 0.9) / cols, (h * 0.9) / rows));
+            slotH = slotW; // Carré de base
             
-            board.style.width = `${slotSize * cols}px`;
-            board.style.height = `${slotSize * rows}px`;
+            board.style.width = `${slotW * cols}px`;
+            board.style.height = `${slotH * rows}px`;
             board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-            // Génération d'image via LoremFlickr pour la démo
-            currentImageUrl = `https://loremflickr.com/${slotSize*cols}/${slotSize*rows}/${data.keyword}?random=${index}`;
+            currentImageUrl = `https://loremflickr.com/${slotW*cols}/${slotH*rows}/${data.keyword}?random=${index}`;
+
+            // Génération de la topologie (Formes aléatoires qui s'emboitent)
+            generateJigsawShapes();
 
             let order = Array.from({length: data.pieces}, (_, i) => i);
             order.sort(() => Math.random() - 0.5);
@@ -392,7 +350,7 @@
                 let slot = document.createElement('div');
                 slot.className = 'puzzle-slot';
                 slot.dataset.idx = i; 
-
+                
                 const pid = order[i];
                 const piece = createPiece(pid, currentImageUrl);
                 slot.appendChild(piece);
@@ -403,130 +361,259 @@
             checkWin();
         }
 
+        // --- GÉNÉRATION DE FORMES (TOPOLOGIE) ---
+        function generateJigsawShapes() {
+            jigsawShapes = [];
+            // Tableau 2D pour stocker les bords verticaux et horizontaux
+            // Horizontal edges: rows * (cols-1)
+            // Vertical edges: (rows-1) * cols
+            
+            for(let i=0; i<cols*rows; i++) {
+                let r = Math.floor(i / cols);
+                let c = i % cols;
+                
+                let top = 0, right = 0, bottom = 0, left = 0;
+
+                // Si pas sur le bord droit, on décide aléatoirement 1 ou -1
+                if(c < cols - 1) {
+                    right = Math.random() > 0.5 ? 1 : -1;
+                }
+                // Si pas sur le bord bas
+                if(r < rows - 1) {
+                    bottom = Math.random() > 0.5 ? 1 : -1;
+                }
+                
+                // On récupère les valeurs des voisins précédents
+                if(c > 0) {
+                    // Mon gauche est l'inverse du droit de mon voisin de gauche
+                    left = -jigsawShapes[i-1].right;
+                }
+                if(r > 0) {
+                    // Mon haut est l'inverse du bas de mon voisin du dessus
+                    top = -jigsawShapes[i-cols].bottom;
+                }
+
+                jigsawShapes.push({ top, right, bottom, left });
+            }
+        }
+
         function createPiece(id, url) {
             const p = document.createElement('div');
             p.className = 'puzzle-piece';
             p.dataset.realId = id; 
 
+            const shape = jigsawShapes[id];
+            
+            // Génération du SVG dynamique
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            
+            // Taille du viewBox: 100x100 unités + marge pour les ergots (25%)
+            // On travaille sur une base de 100x100 pour faciliter les calculs
+            // Viewbox va de -25 à 125 pour laisser la place aux bosses
+            svg.setAttribute("viewBox", "-25 -25 150 150"); 
+
+            // Définition du chemin (Path) de la pièce
+            const pathData = getPuzzlePath(shape.top, shape.right, shape.bottom, shape.left);
+            
+            // 1. ClipPath pour l'image
+            const defs = document.createElementNS(svgNS, "defs");
+            const clipPath = document.createElementNS(svgNS, "clipPath");
+            const clipID = `clip-${id}-${Math.random().toString(36).substr(2, 5)}`;
+            clipPath.setAttribute("id", clipID);
+            
+            const path = document.createElementNS(svgNS, "path");
+            path.setAttribute("d", pathData);
+            clipPath.appendChild(path);
+            defs.appendChild(clipPath);
+            svg.appendChild(defs);
+
+            // 2. L'image clippée
+            const image = document.createElementNS(svgNS, "image");
+            image.setAttributeNS("http://www.w3.org/1999/xlink", "href", url);
+            
+            // Calcul de la position de l'image globale par rapport à cette pièce
+            // La pièce représente 1/cols de largeur et 1/rows de hauteur
+            // L'image doit être scalée et translatée
             const cx = id % cols;
             const cy = Math.floor(id / cols);
             
-            p.style.backgroundImage = `url(${url})`;
-            p.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
-            p.style.backgroundPosition = `${(cx / (cols-1))*100}% ${(cy / (rows-1))*100}%`;
-            if (cols === 1) p.style.backgroundPositionX = "0%";
-            if (rows === 1) p.style.backgroundPositionY = "0%";
+            // La largeur totale dans le repère local est (100 * cols)
+            image.setAttribute("width", `${cols * 100}`);
+            image.setAttribute("height", `${rows * 100}`);
+            image.setAttribute("x", `${-cx * 100}`);
+            image.setAttribute("y", `${-cy * 100}`);
+            image.setAttribute("clip-path", `url(#${clipID})`);
+            
+            svg.appendChild(image);
 
+            // 3. Un path invisible par dessus pour gérer la bordure (stroke)
+            const borderPath = document.createElementNS(svgNS, "path");
+            borderPath.setAttribute("d", pathData);
+            // La classe CSS gérera le stroke
+            svg.appendChild(borderPath);
+
+            p.appendChild(svg);
             p.addEventListener('pointerdown', startDrag);
             return p;
         }
 
-        // --- MOTEUR PHYSIQUE (LOCK IN PLACE) ---
+        // Fonction mathématique pour dessiner les courbes de Bézier
+        function getPuzzlePath(top, right, bottom, left) {
+            let d = "";
+            
+            // Haut
+            d += `M 0 0 `;
+            if (top !== 0) {
+                d += curve(top, true); // true = horizontal
+            } else {
+                d += `L 100 0 `;
+            }
+
+            // Droite
+            if (right !== 0) {
+                d += curve(right, false); // false = vertical
+            } else {
+                d += `L 100 100 `;
+            }
+
+            // Bas (On dessine de droite à gauche)
+            if (bottom !== 0) {
+                d += curve(bottom, true, true); // true=horiz, true=reverse
+            } else {
+                d += `L 0 100 `;
+            }
+
+            // Gauche (On dessine de bas en haut)
+            if (left !== 0) {
+                d += curve(left, false, true);
+            } else {
+                d += `L 0 0 `;
+            }
+            
+            return d;
+        }
+
+        // Générateur de courbe pour un côté (0 à 100)
+        function curve(type, horizontal, reverse = false) {
+            // Forme standard d'un ergot de puzzle (Curvy)
+            // Points de contrôle relatifs pour une base de 100px
+            // C = Cubic Bezier (dx1 dy1, dx2 dy2, dx dy)
+            
+            // Sens du dessin
+            const s = reverse ? -1 : 1; 
+            const t = type * s; // 1 = bosse vers l'extérieur (droite/bas), -1 = intérieur
+
+            // Coordonnées pour une ligne horizontale (Top/Bottom)
+            if (horizontal) {
+                // Base: 0,0 -> 100,0. Ergot au milieu.
+                // Variation simplifiée : L 35 0 C 35 t*30, 65 t*30, 65 0 L 100 0
+                // Variation plus réaliste "Jigsaw":
+                // 3 parties : épaule, tête, épaule
+                
+                const h = 25 * t; // Hauteur ergot
+                
+                if(!reverse) {
+                    // Gauche à Droite
+                    return `L 35 0 C 35 ${h}, 65 ${h}, 65 0 L 100 0 `;
+                } else {
+                    // Droite à Gauche (100,100 -> 0,100)
+                    // On part de 100, y. On va vers 0.
+                    // Donc L 65 100 ...
+                    return `L 65 100 C 65 ${100+h}, 35 ${100+h}, 35 100 L 0 100 `;
+                }
+            } 
+            // Coordonnées pour une ligne verticale (Right/Left)
+            else {
+                const w = 25 * t; // Largeur ergot
+                
+                if(!reverse) {
+                    // Haut en Bas (100,0 -> 100,100)
+                    return `L 100 35 C ${100+w} 35, ${100+w} 65, 100 65 L 100 100 `;
+                } else {
+                    // Bas en Haut (0,100 -> 0,0)
+                    return `L 0 65 C ${w} 65, ${w} 35, 0 35 L 0 0 `;
+                }
+            }
+        }
+
+        // --- MOTEUR PHYSIQUE ---
         function startDrag(e) {
             e.preventDefault();
-            const piece = e.target;
+            const piece = e.target.closest('.puzzle-piece');
             if (piece.classList.contains('locked')) return;
-
-            draggedPiece = piece;
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-
-            piece.classList.add('dragging');
-            piece.setPointerCapture(e.pointerId);
-
-            document.addEventListener('pointermove', onDrag);
-            document.addEventListener('pointerup', endDrag);
+            draggedPiece = piece; isDragging = true; startX = e.clientX; startY = e.clientY;
+            piece.classList.add('dragging'); piece.setPointerCapture(e.pointerId);
+            document.addEventListener('pointermove', onDrag); document.addEventListener('pointerup', endDrag);
         }
-
         function onDrag(e) {
             if (!isDragging || !draggedPiece) return;
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            draggedPiece.style.transform = `translate(${dx}px, ${dy}px)`;
+            draggedPiece.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
         }
-
         function endDrag(e) {
             if (!isDragging || !draggedPiece) return;
             isDragging = false;
-            
-            document.removeEventListener('pointermove', onDrag);
-            document.removeEventListener('pointerup', endDrag);
-
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            const colShift = Math.round(dx / slotSize);
-            const rowShift = Math.round(dy / slotSize);
-            const idxShift = (rowShift * cols) + colShift;
-
-            draggedPiece.classList.remove('dragging');
-            draggedPiece.style.transform = ''; 
-            draggedPiece.releasePointerCapture(e.pointerId);
-
-            if (colShift !== 0 || rowShift !== 0) {
-                tryMovePiece(draggedPiece, colShift, idxShift);
-            }
+            document.removeEventListener('pointermove', onDrag); document.removeEventListener('pointerup', endDrag);
+            const colShift = Math.round((e.clientX - startX) / slotW);
+            const rowShift = Math.round((e.clientY - startY) / slotW);
+            draggedPiece.classList.remove('dragging'); draggedPiece.style.transform = ''; draggedPiece.releasePointerCapture(e.pointerId);
+            if (colShift !== 0 || rowShift !== 0) tryMovePiece(draggedPiece, colShift, (rowShift * cols) + colShift);
             draggedPiece = null;
         }
-
         function tryMovePiece(piece, cShift, iShift) {
-            const oldSlot = piece.parentNode;
-            const oldIdx = parseInt(oldSlot.dataset.idx);
-            const newIdx = oldIdx + iShift;
-
+            const oldSlot = piece.parentNode; const oldIdx = parseInt(oldSlot.dataset.idx); const newIdx = oldIdx + iShift;
             if (newIdx < 0 || newIdx >= (cols * rows)) return;
-            const oldC = oldIdx % cols;
-            const newC = newIdx % cols;
+            const oldC = oldIdx % cols; const newC = newIdx % cols;
             if (newC !== oldC + cShift) return;
-
             const targetSlot = document.querySelector(`.puzzle-slot[data-idx='${newIdx}']`);
             const resident = targetSlot.children[0];
-
             if (resident && resident.classList.contains('locked')) return;
-
             if (resident) oldSlot.appendChild(resident);
             targetSlot.appendChild(piece);
-
-            checkIfPieceShouldLock(piece, targetSlot);
-            if (resident) checkIfPieceShouldLock(resident, oldSlot);
+            checkIfPieceShouldLock(piece, targetSlot); if (resident) checkIfPieceShouldLock(resident, oldSlot);
             checkWin();
         }
-
         function checkIfPieceShouldLock(piece, slot) {
-            if (!piece || !slot) return;
-            const realId = parseInt(piece.dataset.realId);
-            const slotIdx = parseInt(slot.dataset.idx);
-
-            if (realId === slotIdx) {
+            if (parseInt(piece.dataset.realId) === parseInt(slot.dataset.idx)) {
                 if (!piece.classList.contains('locked')) {
-                    piece.classList.add('locked');
-                    piece.classList.add('just-locked');
-                    setTimeout(() => piece.classList.remove('just-locked'), 600);
+                    piece.classList.add('locked', 'just-locked'); setTimeout(() => piece.classList.remove('just-locked'), 600);
                 }
             }
         }
 
-        function calcGrid(total, w, h) {
-            const ratio = w / h;
-            let bestC=1, bestR=total, bestDiff=999;
-            for(let c=1; c<=total; c++) {
-                if(total%c===0) {
-                    let r = total/c;
-                    let diff = Math.abs((c/r)-ratio);
-                    if(diff < bestDiff) { bestDiff=diff; bestC=c; bestR=r; }
-                }
-            }
-            return {cols: bestC, rows: bestR};
-        }
-
+        // --- WIN & PROGRESSION ---
         function checkWin() {
             const total = cols * rows;
-            const lockedCount = document.querySelectorAll('.puzzle-piece.locked').length;
-            if (lockedCount === total && total > 0) {
+            if (document.querySelectorAll('.puzzle-piece.locked').length === total && total > 0) {
+                // Animation de victoire : On retire les bordures pour fusionner l'image
+                document.querySelectorAll('.puzzle-piece path').forEach(p => p.style.stroke = "none");
                 document.getElementById('board').style.borderColor = "var(--accent-color)";
                 document.getElementById('btn-next').style.display = "block";
             }
         }
+        function openRewardModal() {
+            const data = levelsData[currentLevel];
+            document.getElementById('story-title').innerText = data.title;
+            document.getElementById('story-location').innerText = data.location;
+            document.getElementById('reward-img').src = currentImageUrl;
+            document.getElementById('story-desc').innerHTML = data.story;
+            document.getElementById('story-modal').classList.add('active');
+        }
+        function finishStoryAndNext() {
+            document.getElementById('story-modal').classList.remove('active');
+            if (currentLevel === maxUnlockedLevel) { maxUnlockedLevel++; localStorage.setItem('puzzleDZ_progress', maxUnlockedLevel); }
+            if (currentLevel + 1 < levelsData.length) { currentLevel++; loadLevel(currentLevel); }
+            else { alert("Félicitations ! Vous avez terminé le voyage !"); goToLevelSelect(); }
+        }
+
+        // --- UTILITAIRES ---
+        function calcGrid(total, w, h) {
+            const ratio = w / h; let bestC=1, bestR=total, bestDiff=999;
+            for(let c=1; c<=total; c++) { if(total%c===0) { let r=total/c; let diff=Math.abs((c/r)-ratio); if(diff<bestDiff){bestDiff=diff;bestC=c;bestR=r;}}}
+            return {cols: bestC, rows: bestR};
+        }
+        function openRefModal() { document.getElementById('ref-image').src = currentImageUrl; document.getElementById('ref-modal').classList.add('active'); }
+        function closeRefModal(e) { if (e.target.classList.contains('modal-overlay')) document.getElementById('ref-modal').classList.remove('active'); }
     </script>
 </body>
 </html>
