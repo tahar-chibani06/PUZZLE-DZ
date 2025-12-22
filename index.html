@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUZZLE DZ - Trésors d'Algerie </title>
+    <title>PUZZLE DZ - Authentic Algeria</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
+            /* --- COULEURS --- */
             --accent-green: #00802b;
             --accent-red: #D60000;
             --text-dark: #1a1a1a;
             --text-grey: #555555;
-            --glass-bg: rgba(255, 255, 255, 0.95);
+            
+            /* VERRE (GLASSMORPHISM CLAIR) */
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 1);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
@@ -25,17 +29,34 @@
             overflow: hidden;
             color: var(--text-dark);
             user-select: none; touch-action: none;
-            background: #f0f0f0; /* Fallback color */
+            background: #f0f0f0;
         }
 
-        /* FOND */
+        /* FOND D'ÉCRAN (IMAGE FLOU) */
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1549650179-b769281203b9?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
-            z-index: -1; filter: blur(12px) brightness(1.1); transform: scale(1.1);
+            background: url('https://images.unsplash.com/photo-1572979929883-7d7222521c92?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+            z-index: -1; 
+            filter: blur(15px) brightness(1.2);
+            transform: scale(1.1);
         }
 
-        /* SCREENS */
+        /* --- CONFETTIS (NOUVEAU) --- */
+        #confetti-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Laisse passer les clics */
+            z-index: 9999; overflow: hidden; display: none;
+        }
+        .confetti {
+            position: absolute; width: 10px; height: 10px;
+            opacity: 0.8;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* --- SCREENS --- */
         .screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center;
@@ -48,7 +69,8 @@
         #splash-screen { justify-content: center; }
         .logo-box {
             background: var(--glass-bg); padding: 40px; border-radius: 25px;
-            box-shadow: var(--shadow); text-align: center; width: 90%; max-width: 400px;
+            border: 2px solid var(--glass-border); box-shadow: var(--shadow);
+            text-align: center; width: 90%; max-width: 400px;
         }
         .title-dz {
             font-size: 3rem; font-weight: 900; margin: 0;
@@ -56,131 +78,120 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-transform: uppercase; letter-spacing: 3px;
         }
+        .subtitle { 
+            font-size: 0.9rem; color: var(--text-grey); margin-top: 10px; 
+            font-weight: 600; letter-spacing: 1px; text-transform: uppercase; 
+        }
         .btn-main {
             margin-top: 30px; padding: 15px 0; width: 100%; font-size: 1.1rem; font-weight: 700;
             color: white; background: linear-gradient(45deg, var(--accent-green), #00b33c);
             border: none; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3); transition: transform 0.2s;
         }
+        .btn-main:active { transform: scale(0.95); }
 
-        /* 2. CATÉGORIES (12 ITEMS) */
-        #category-screen { padding-top: 20px; }
+        /* 2. CATÉGORIES */
+        #category-screen { padding-top: 40px; }
         .screen-header { 
-            font-size: 1.5rem; font-weight: 900; margin: 20px 0; 
-            text-transform: uppercase; color: var(--text-dark);
+            font-size: 1.6rem; font-weight: 900; margin-bottom: 30px; 
+            text-transform: uppercase; text-align: center; color: var(--text-dark);
             text-shadow: 0 2px 20px rgba(255,255,255,0.8);
         }
 
         .category-list {
             display: grid; grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; width: 95%; max-width: 500px; padding-bottom: 50px;
+            gap: 15px; width: 90%; max-width: 500px;
         }
 
         .cat-card {
-            background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; 
-            border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; 
+            transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.05);
         }
-        .cat-card:active { transform: scale(0.96); }
-        .cat-img { height: 80px; object-fit: cover; width: 100%; background: #ddd; }
-        .cat-info { padding: 10px; text-align: center; }
-        .cat-title { font-weight: 800; font-size: 0.75rem; color: var(--text-dark); text-transform: uppercase; margin-bottom: 2px;}
-        .cat-count { font-size: 0.65rem; color: var(--accent-green); font-weight: 700; }
+        .cat-card:active { transform: scale(0.95); }
+        .cat-img { height: 90px; object-fit: cover; width: 100%; }
+        .cat-info { padding: 12px; text-align: center; }
+        .cat-title { font-weight: 800; font-size: 0.8rem; color: var(--text-dark); margin-bottom: 3px; text-transform: uppercase;}
+        .cat-count { font-size: 0.7rem; color: var(--accent-green); font-weight: 700; }
 
         /* 3. NIVEAUX */
         .top-bar {
             width: 95%; max-width: 600px; display: flex; justify-content: space-between; align-items: center;
-            margin: 15px 0;
+            margin: 20px 0;
         }
         .btn-round {
-            background: white; border: none; width: 40px; height: 40px; border-radius: 50%;
+            background: white; border: none; width: 45px; height: 45px; border-radius: 50%;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1); cursor: pointer; display: flex; justify-content: center; align-items: center;
             font-weight: 800; color: var(--text-dark); font-size: 1.2rem;
         }
+
         .level-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
             width: 95%; max-width: 500px; padding-bottom: 50px;
         }
         .level-card {
-            aspect-ratio: 1; background: white; border-radius: 8px;
+            aspect-ratio: 1; background: white; border-radius: 10px;
             position: relative; overflow: hidden; cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid white;
         }
-        .level-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; background: #eee; }
+        .level-card.locked { opacity: 0.6; filter: grayscale(1); cursor: not-allowed; background: #eee; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .level-num {
             position: absolute; bottom: 0; right: 0; background: rgba(0,0,0,0.6);
-            color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 6px;
-            border-top-left-radius: 6px;
+            color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 8px;
+            border-top-left-radius: 8px;
         }
 
-        /* 4. JEU (CORRECTIF VISIBILITÉ) */
-        #game-screen { overflow: hidden; height: 100vh; width: 100vw; background: rgba(255,255,255,0.2); }
+        /* 4. JEU */
+        #game-screen { overflow: hidden; height: 100vh; width: 100vw; background: rgba(255,255,255,0.3); }
         
         header {
             width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
         }
         .btn-menu {
-            background: #f4f4f4; border: none; color: var(--text-dark);
+            background: #f0f0f0; border: none; color: var(--text-dark);
             padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
         }
-        .level-title-game { font-size: 0.8rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .level-title-game { font-size: 0.9rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .game-area {
             flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;
-            position: relative; overflow: hidden; padding: 15px;
+            position: relative; overflow: hidden; padding: 10px;
         }
 
         .puzzle-board {
-            /* Le JS va définir la taille */
             display: grid; gap: 1px; 
-            background: rgba(255,255,255,0.8); /* Fond blanc pour voir les trous */
+            background: rgba(255,255,255,0.5);
             border: 4px solid white;
             border-radius: 4px; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.2);
             position: relative;
         }
 
-        .puzzle-slot { 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.03); 
-            position: relative; 
-        }
+        .puzzle-slot { width: 100%; height: 100%; background: rgba(0,0,0,0.05); }
 
-        /* PIÈCES : FIX POSITION */
         .puzzle-piece {
-            width: 100%; height: 100%; 
-            cursor: grab; 
-            background-repeat: no-repeat;
-            background-color: #ccc; /* Fallback si image charge pas */
-            
-            /* Position relative par défaut pour rester dans le slot */
-            position: relative; 
-            z-index: 1;
-            
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
-            border-radius: 2px;
-            transition: transform 0.1s;
-        }
-
-        /* Quand on drag, on utilise fixed ou absolute par rapport au body pour pas être coupé */
-        /* Mais ici, on garde transform translate qui est performant */
-        .puzzle-piece.dragging {
-            z-index: 1000 !important; 
-            opacity: 0.9;
-            transition: none !important; 
-            box-shadow: 0 0 0 2px var(--accent-red), 0 15px 30px rgba(0,0,0,0.4) !important;
-            transform: scale(1.1);
-        }
-
-        .puzzle-piece.locked { 
-            cursor: default; z-index: 0; box-shadow: none !important; border:none; 
-            filter: brightness(1.05); /* Petit pop visuel */
+            width: 100%; height: 100%; cursor: grab; background-repeat: no-repeat;
+            position: relative; z-index: 1; /* Relative pour l'affichage initial */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+            transition: transform 0.1s; background-color: #ddd; 
         }
         
+        /* Quand on drag, on passe en fixed ou on reste en relative avec translate */
+        .puzzle-piece.dragging {
+            z-index: 1000 !important; 
+            transition: none !important; 
+            box-shadow: 0 0 0 2px var(--accent-red), 0 15px 30px rgba(0,0,0,0.3) !important;
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        
+        /* En mode verrouillé */
+        .puzzle-piece.locked { z-index: 0; cursor: default; box-shadow: none !important; }
+        
         @keyframes flash { 0% { filter: brightness(1); } 50% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
-        .just-locked { animation: flash 0.4s; }
+        .just-locked { animation: flash 0.3s; }
 
         /* MODALES */
         .modal-overlay {
@@ -200,7 +211,13 @@
         .modal-img { display: block; max-width: 100%; max-height: 50vh; object-fit: contain; }
         .story-container { padding: 25px; text-align: center; overflow-y: auto; width: 100%; }
         
-        .story-title { color: var(--accent-green); font-size: 1.4rem; font-weight: 800; margin: 0; }
+        /* TITRE VICTOIRE EN ROUGE/VERT */
+        .story-title { 
+            color: var(--accent-green); font-size: 1.5rem; font-weight: 900; margin: 0; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .story-subtitle { font-size: 0.9rem; font-weight:700; color: var(--accent-red); margin-top:5px; text-transform:uppercase;}
+
         .story-text { font-size: 0.95rem; line-height: 1.6; color: #333; margin-top: 15px; text-align: justify; }
         
         .btn-victory {
@@ -217,6 +234,8 @@
 <body>
 
     <div class="bg-layer"></div>
+    
+    <div id="confetti-container"></div>
 
     <div id="splash-screen" class="screen">
         <div style="flex:1"></div>
@@ -230,7 +249,7 @@
     </div>
 
     <div id="category-screen" class="screen hidden">
-        <div class="screen-header">12 THÈMES</div>
+        <div class="screen-header">THÈMES</div>
         <div class="category-list" id="category-list"></div>
     </div>
 
@@ -254,7 +273,7 @@
             <div id="board" class="puzzle-board"></div>
         </div>
 
-        <button id="btn-victory" class="btn-victory" onclick="openRewardModal()">NIVEAU TERMINÉ ➜</button>
+        <button id="btn-victory" class="btn-victory" onclick="openRewardModal()">VOIR LE RÉSULTAT</button>
     </div>
 
     <div id="ref-modal" class="modal-overlay" onclick="closeModal('ref-modal')">
@@ -265,9 +284,10 @@
         <div class="modal-content">
             <img id="reward-img" class="modal-img" src="" style="width:100%; object-fit:cover;">
             <div class="story-container">
-                <h2 class="story-title" id="story-title"></h2>
+                <h2 class="story-title">BRAVO VOUS AVEZ RÉUSSI</h2>
+                <div class="story-subtitle" id="story-title-sub"></div>
                 <div class="story-text" id="story-desc"></div>
-                <button class="btn-continue" onclick="finishStoryAndNext()">CONTINUER</button>
+                <button class="btn-continue" onclick="finishStoryAndNext()">NIVEAU SUIVANT ➜</button>
             </div>
         </div>
     </div>
@@ -275,11 +295,11 @@
     <script>
         // --- 12 CATÉGORIES ---
         const baseCategories = [
-            { id: 'nature', title: "SITES NATURELS", img: "https://loremflickr.com/400/300/nature,algeria", key: "nature" },
-            { id: 'history', title: "HISTOIRE & RUINES", img: "https://loremflickr.com/400/300/ruins,roman", key: "history" },
+            { id: 'nature', title: "SITES NATURELS", img: "https://loremflickr.com/400/300/landscape,algeria", key: "nature" },
+            { id: 'history', title: "HISTOIRE & RUINES", img: "https://loremflickr.com/400/300/ruins,roman", key: "ruins" },
             { id: 'culture', title: "CULTURE", img: "https://loremflickr.com/400/300/culture,art", key: "culture" },
             { id: 'food', title: "GASTRONOMIE", img: "https://loremflickr.com/400/300/food,couscous", key: "food" },
-            { id: 'arch', title: "ARCHITECTURE", img: "https://loremflickr.com/400/300/architecture,building", key: "architecture" },
+            { id: 'arch', title: "ARCHITECTURE", img: "https://loremflickr.com/400/300/building,architecture", key: "architecture" },
             { id: 'wild', title: "FAUNE", img: "https://loremflickr.com/400/300/animal,wildlife", key: "animal" },
             { id: 'sahara', title: "SAHARA", img: "https://loremflickr.com/400/300/desert,sand", key: "sahara" },
             { id: 'sea', title: "MÉDITERRANÉE", img: "https://loremflickr.com/400/300/sea,beach", key: "sea" },
@@ -297,7 +317,7 @@
                 levels.push({
                     pieces: 9 + Math.floor(i/5)*3,
                     key: `${cat.key},algeria`,
-                    story: `<p>Bravo ! Vous avez terminé ce puzzle de la catégorie <strong>${cat.title}</strong>.</p><p>Explorez les 50 niveaux pour découvrir toute la richesse de l'Algérie, des côtes de la Méditerranée aux dunes du Sahara.</p><p>Chaque image raconte une histoire unique de notre patrimoine.</p>`
+                    story: `<p>Félicitations pour avoir terminé ce puzzle de la catégorie <strong>${cat.title}</strong>.</p><p>Chaque pièce assemblée révèle un peu plus la beauté de notre patrimoine.</p>`
                 });
             }
             gameData[cat.id] = { ...cat, levels: levels };
@@ -355,7 +375,7 @@
         function backToLevels() { hideAll(); document.getElementById('level-select-screen').classList.remove('hidden'); }
         function hideAll() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); }
 
-        // --- MOTEUR DE JEU (FIXE) ---
+        // --- MOTEUR DE JEU (FIXE VISIBILITÉ) ---
         function launchLevel(idx) {
             currentLevelIdx = idx;
             hideAll();
@@ -425,32 +445,48 @@
             const p = e.target;
             if(p.classList.contains('locked')) return;
             draggedPiece = p; startX = e.clientX; startY = e.clientY;
+            
+            // Passer en absolute pour le drag
+            p.style.position = 'fixed';
+            p.style.width = slotSize + 'px';
+            p.style.height = slotSize + 'px';
+            p.style.left = (e.clientX - slotSize/2) + 'px';
+            p.style.top = (e.clientY - slotSize/2) + 'px';
+            
             p.classList.add('dragging'); p.setPointerCapture(e.pointerId);
             p.addEventListener('pointermove', dragMove); p.addEventListener('pointerup', dragEnd);
         }
         function dragMove(e) {
             if(!draggedPiece) return;
-            draggedPiece.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
+            draggedPiece.style.left = (e.clientX - slotSize/2) + 'px';
+            draggedPiece.style.top = (e.clientY - slotSize/2) + 'px';
         }
         function dragEnd(e) {
             if(!draggedPiece) return;
-            draggedPiece.classList.remove('dragging'); draggedPiece.style.transform = '';
-            draggedPiece.releasePointerCapture(e.pointerId);
-            draggedPiece.removeEventListener('pointermove', dragMove);
-            draggedPiece.removeEventListener('pointerup', dragEnd);
+            const p = draggedPiece;
+            
+            p.classList.remove('dragging');
+            p.releasePointerCapture(e.pointerId);
+            p.removeEventListener('pointermove', dragMove);
+            p.removeEventListener('pointerup', dragEnd);
 
-            draggedPiece.style.visibility = 'hidden';
+            // Reset styles
+            p.style.position = 'absolute';
+            p.style.left = '0'; p.style.top = '0';
+            p.style.width = '100%'; p.style.height = '100%';
+
+            p.style.visibility = 'hidden';
             const el = document.elementFromPoint(e.clientX, e.clientY);
-            draggedPiece.style.visibility = 'visible';
+            p.style.visibility = 'visible';
             
             const targetSlot = el ? el.closest('.puzzle-slot') : null;
-            if (targetSlot && targetSlot !== draggedPiece.parentNode) {
-                const oldSlot = draggedPiece.parentNode;
+            if (targetSlot && targetSlot !== p.parentNode) {
+                const oldSlot = p.parentNode;
                 const resident = targetSlot.children[0];
                 if (!resident || !resident.classList.contains('locked')) {
                     if(resident) oldSlot.appendChild(resident);
-                    targetSlot.appendChild(draggedPiece);
-                    checkLock(draggedPiece, targetSlot);
+                    targetSlot.appendChild(p);
+                    checkLock(p, targetSlot);
                     if(resident) checkLock(resident, oldSlot);
                     checkWin();
                 }
@@ -466,19 +502,48 @@
         }
         function checkWin() {
             if (document.querySelectorAll('.puzzle-piece.locked').length === cols*rows) {
-                document.getElementById('btn-victory').style.display = 'block';
+                setTimeout(showVictory, 600);
             }
+        }
+
+        // --- VICTOIRE & CONFETTIS ---
+        function showVictory() {
+            launchConfetti(); // Lance les confettis
+            openRewardModal();
+        }
+
+        function launchConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.style.display = 'block';
+            container.innerHTML = '';
+            
+            const colors = ['#D60000', '#00802b', '#ffffff', '#FFD700']; // Couleurs DZ + Or
+            
+            for(let i=0; i<100; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                conf.style.top = -10 + 'px';
+                container.appendChild(conf);
+            }
+            
+            // Nettoyage après 4s
+            setTimeout(() => { 
+                container.style.display = 'none'; 
+                container.innerHTML = ''; 
+            }, 4000);
         }
 
         // --- MODALES ---
         function openRewardModal() {
             const lvl = currentCategory.levels[currentLevelIdx];
-            document.getElementById('story-title').innerText = "MAGNIFIQUE !";
+            document.getElementById('story-title-sub').innerText = `NIVEAU ${currentLevelIdx+1}`;
             document.getElementById('reward-img').src = currentImageUrl;
             document.getElementById('story-desc').innerHTML = lvl.story;
             document.getElementById('story-modal').classList.add('active');
         }
-        
         function finishStoryAndNext() {
             document.getElementById('story-modal').classList.remove('active');
             let saved = parseInt(localStorage.getItem(`pz_${currentCategory.id}`)) || 0;
@@ -486,7 +551,6 @@
             if(currentLevelIdx + 1 < currentCategory.levels.length) launchLevel(currentLevelIdx + 1);
             else backToLevels();
         }
-
         function openRefModal() {
             document.getElementById('ref-image').src = currentImageUrl;
             document.getElementById('ref-modal').classList.add('active');
