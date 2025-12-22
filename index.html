@@ -13,11 +13,14 @@
             --accent-red: #D60000;
             --text-dark: #1a1a1a;
             --text-grey: #555555;
-            
-            /* VERRE (GLASSMORPHISM CLAIR) */
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-border: rgba(255, 255, 255, 1);
+            --glass-bg: rgba(255, 255, 255, 0.95);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            
+            /* Difficultés */
+            --diff-easy: #27ae60;
+            --diff-med: #f39c12;
+            --diff-hard: #e74c3c;
+            --diff-ext: #8e44ad;
         }
 
         * { box-sizing: border-box; }
@@ -32,31 +35,25 @@
             background: #f0f0f0;
         }
 
-        /* FOND D'ÉCRAN (IMAGE FLOU) */
+        /* FOND */
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1572979929883-7d7222521c92?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
-            z-index: -1; 
-            filter: blur(15px) brightness(1.2);
-            transform: scale(1.1);
+            background: url('https://images.unsplash.com/photo-1549650179-b769281203b9?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+            z-index: -1; filter: blur(12px) brightness(1.1); transform: scale(1.1);
         }
 
-        /* --- CONFETTIS (NOUVEAU) --- */
+        /* CONFETTIS */
         #confetti-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Laisse passer les clics */
-            z-index: 9999; overflow: hidden; display: none;
+            pointer-events: none; z-index: 9999; overflow: hidden; display: none;
         }
         .confetti {
-            position: absolute; width: 10px; height: 10px;
-            opacity: 0.8;
+            position: absolute; width: 10px; height: 10px; opacity: 0.8;
             animation: fall linear forwards;
         }
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
-        /* --- SCREENS --- */
+        /* SCREENS */
         .screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center;
@@ -69,8 +66,7 @@
         #splash-screen { justify-content: center; }
         .logo-box {
             background: var(--glass-bg); padding: 40px; border-radius: 25px;
-            border: 2px solid var(--glass-border); box-shadow: var(--shadow);
-            text-align: center; width: 90%; max-width: 400px;
+            box-shadow: var(--shadow); text-align: center; width: 90%; max-width: 400px;
         }
         .title-dz {
             font-size: 3rem; font-weight: 900; margin: 0;
@@ -78,120 +74,116 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-transform: uppercase; letter-spacing: 3px;
         }
-        .subtitle { 
-            font-size: 0.9rem; color: var(--text-grey); margin-top: 10px; 
-            font-weight: 600; letter-spacing: 1px; text-transform: uppercase; 
-        }
+        .subtitle { font-size: 0.9rem; margin-top: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-grey); }
         .btn-main {
             margin-top: 30px; padding: 15px 0; width: 100%; font-size: 1.1rem; font-weight: 700;
             color: white; background: linear-gradient(45deg, var(--accent-green), #00b33c);
             border: none; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3); transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3);
         }
-        .btn-main:active { transform: scale(0.95); }
 
         /* 2. CATÉGORIES */
-        #category-screen { padding-top: 40px; }
+        #category-screen { padding-top: 20px; }
         .screen-header { 
-            font-size: 1.6rem; font-weight: 900; margin-bottom: 30px; 
-            text-transform: uppercase; text-align: center; color: var(--text-dark);
+            font-size: 1.5rem; font-weight: 900; margin: 20px 0; 
+            text-transform: uppercase; color: var(--text-dark);
             text-shadow: 0 2px 20px rgba(255,255,255,0.8);
         }
-
         .category-list {
             display: grid; grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; width: 90%; max-width: 500px;
+            gap: 15px; width: 95%; max-width: 500px; padding-bottom: 50px;
         }
-
         .cat-card {
-            background: white; border-radius: 15px; overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; 
-            transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.05);
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; 
+            border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            transition: transform 0.2s;
         }
-        .cat-card:active { transform: scale(0.95); }
-        .cat-img { height: 90px; object-fit: cover; width: 100%; }
-        .cat-info { padding: 12px; text-align: center; }
-        .cat-title { font-weight: 800; font-size: 0.8rem; color: var(--text-dark); margin-bottom: 3px; text-transform: uppercase;}
-        .cat-count { font-size: 0.7rem; color: var(--accent-green); font-weight: 700; }
+        .cat-card:active { transform: scale(0.96); }
+        .cat-img { height: 80px; object-fit: cover; width: 100%; background: #ddd; }
+        .cat-info { padding: 10px; text-align: center; }
+        .cat-title { font-weight: 800; font-size: 0.75rem; color: var(--text-dark); text-transform: uppercase; margin-bottom: 2px;}
+        .cat-count { font-size: 0.65rem; color: var(--accent-green); font-weight: 700; }
 
         /* 3. NIVEAUX */
         .top-bar {
             width: 95%; max-width: 600px; display: flex; justify-content: space-between; align-items: center;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         .btn-round {
-            background: white; border: none; width: 45px; height: 45px; border-radius: 50%;
+            background: white; border: none; width: 40px; height: 40px; border-radius: 50%;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1); cursor: pointer; display: flex; justify-content: center; align-items: center;
             font-weight: 800; color: var(--text-dark); font-size: 1.2rem;
         }
-
         .level-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
             width: 95%; max-width: 500px; padding-bottom: 50px;
         }
         .level-card {
-            aspect-ratio: 1; background: white; border-radius: 10px;
+            aspect-ratio: 1; background: white; border-radius: 8px;
             position: relative; overflow: hidden; cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .level-card.locked { opacity: 0.6; filter: grayscale(1); cursor: not-allowed; background: #eee; }
+        .level-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; background: #eee; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .level-num {
             position: absolute; bottom: 0; right: 0; background: rgba(0,0,0,0.6);
-            color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 8px;
-            border-top-left-radius: 8px;
+            color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 6px;
+            border-top-left-radius: 6px;
         }
 
         /* 4. JEU */
-        #game-screen { overflow: hidden; height: 100vh; width: 100vw; background: rgba(255,255,255,0.3); }
+        #game-screen { overflow: hidden; height: 100vh; width: 100vw; background: rgba(255,255,255,0.2); }
         
         header {
-            width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center;
+            width: 100%; height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
         }
         .btn-menu {
-            background: #f0f0f0; border: none; color: var(--text-dark);
+            background: #f4f4f4; border: none; color: var(--text-dark);
             padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
         }
-        .level-title-game { font-size: 0.9rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* HEADER INFO & DIFFICULTY */
+        .game-header-info { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .level-title-game { font-size: 0.85rem; font-weight: 800; color: var(--text-dark); text-transform: uppercase; margin-bottom: 2px;}
+        
+        .difficulty-badge {
+            font-size: 0.65rem; font-weight: 700; color: white;
+            padding: 2px 10px; border-radius: 10px; text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
         .game-area {
             flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;
-            position: relative; overflow: hidden; padding: 10px;
+            position: relative; overflow: hidden; padding: 15px;
         }
 
         .puzzle-board {
             display: grid; gap: 1px; 
-            background: rgba(255,255,255,0.5);
-            border: 4px solid white;
-            border-radius: 4px; 
+            background: rgba(255,255,255,0.8);
+            border: 4px solid white; border-radius: 4px; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.2);
             position: relative;
         }
 
-        .puzzle-slot { width: 100%; height: 100%; background: rgba(0,0,0,0.05); }
+        .puzzle-slot { width: 100%; height: 100%; background: rgba(0,0,0,0.03); position: relative; }
 
         .puzzle-piece {
             width: 100%; height: 100%; cursor: grab; background-repeat: no-repeat;
-            position: relative; z-index: 1; /* Relative pour l'affichage initial */
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
-            transition: transform 0.1s; background-color: #ddd; 
+            position: relative; z-index: 1;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+            transition: transform 0.1s; background-color: #ddd; border-radius: 2px;
         }
-        
-        /* Quand on drag, on passe en fixed ou on reste en relative avec translate */
         .puzzle-piece.dragging {
-            z-index: 1000 !important; 
-            transition: none !important; 
-            box-shadow: 0 0 0 2px var(--accent-red), 0 15px 30px rgba(0,0,0,0.3) !important;
-            transform: scale(1.05);
-            opacity: 0.9;
+            z-index: 1000 !important; opacity: 0.9; transition: none !important; 
+            box-shadow: 0 0 0 2px var(--accent-red), 0 15px 30px rgba(0,0,0,0.4) !important;
+            transform: scale(1.1);
         }
-        
-        /* En mode verrouillé */
-        .puzzle-piece.locked { z-index: 0; cursor: default; box-shadow: none !important; }
+        .puzzle-piece.locked { cursor: default; z-index: 0; box-shadow: none !important; border:none; filter: brightness(1.05); }
         
         @keyframes flash { 0% { filter: brightness(1); } 50% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
-        .just-locked { animation: flash 0.3s; }
+        .just-locked { animation: flash 0.4s; }
 
         /* MODALES */
         .modal-overlay {
@@ -208,17 +200,19 @@
             overflow: hidden; display: flex; flex-direction: column; align-items: center;
             border: 1px solid #eee;
         }
-        .modal-img { display: block; max-width: 100%; max-height: 50vh; object-fit: contain; }
-        .story-container { padding: 25px; text-align: center; overflow-y: auto; width: 100%; }
+        .modal-img { display: block; max-width: 100%; max-height: 40vh; object-fit: contain; }
         
-        /* TITRE VICTOIRE EN ROUGE/VERT */
-        .story-title { 
-            color: var(--accent-green); font-size: 1.5rem; font-weight: 900; margin: 0; 
-            text-transform: uppercase; letter-spacing: 1px;
+        /* STORY SCROLL */
+        .story-container { padding: 25px; text-align: center; overflow-y: auto; width: 100%; flex:1; }
+        
+        .story-title { color: var(--accent-green); font-size: 1.4rem; font-weight: 800; margin: 0; margin-bottom: 5px; }
+        .story-subtitle { font-size: 0.9rem; font-weight:700; color: var(--accent-red); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* 3 Paragraphes Style */
+        .story-text p {
+            font-size: 0.95rem; line-height: 1.6; color: #333; margin-bottom: 15px; 
+            text-align: justify; text-justify: inter-word;
         }
-        .story-subtitle { font-size: 0.9rem; font-weight:700; color: var(--accent-red); margin-top:5px; text-transform:uppercase;}
-
-        .story-text { font-size: 0.95rem; line-height: 1.6; color: #333; margin-top: 15px; text-align: justify; }
         
         .btn-victory {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -226,7 +220,7 @@
             font-weight: 700; box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3); display: none; z-index: 2000;
         }
         .btn-continue {
-            margin-top: 20px; padding: 15px 0; width: 100%; background: var(--accent-green); 
+            margin-top: 10px; padding: 15px 0; width: 100%; background: var(--accent-green); 
             color: white; border: none; border-radius: 50px; font-weight: 700; cursor: pointer;
         }
     </style>
@@ -234,7 +228,6 @@
 <body>
 
     <div class="bg-layer"></div>
-    
     <div id="confetti-container"></div>
 
     <div id="splash-screen" class="screen">
@@ -249,7 +242,7 @@
     </div>
 
     <div id="category-screen" class="screen hidden">
-        <div class="screen-header">THÈMES</div>
+        <div class="screen-header">12 THÈMES</div>
         <div class="category-list" id="category-list"></div>
     </div>
 
@@ -265,7 +258,12 @@
     <div id="game-screen" class="screen hidden">
         <header>
             <button class="btn-menu" onclick="backToLevels()">❮ RETOUR</button>
-            <div class="level-title-game" id="game-title">TITRE</div>
+            
+            <div class="game-header-info">
+                <div class="level-title-game" id="game-title">TITRE</div>
+                <div class="difficulty-badge" id="diff-badge">FACILE</div>
+            </div>
+
             <button class="btn-menu" onclick="openRefModal()">👁️</button>
         </header>
 
@@ -282,10 +280,12 @@
 
     <div id="story-modal" class="modal-overlay">
         <div class="modal-content">
-            <img id="reward-img" class="modal-img" src="" style="width:100%; object-fit:cover;">
+            <div style="padding:20px; width:100%; border-bottom:1px solid #eee;">
+                <h2 style="color:var(--accent-green); margin:0; text-align:center; font-size:1.2rem; font-weight:900;">BRAVO VOUS AVEZ RÉUSSI !</h2>
+            </div>
+            <img id="reward-img" class="modal-img" src="" style="width:100%; max-height:35vh; object-fit:cover;">
             <div class="story-container">
-                <h2 class="story-title">BRAVO VOUS AVEZ RÉUSSI</h2>
-                <div class="story-subtitle" id="story-title-sub"></div>
+                <div class="story-subtitle" id="story-location">LIEU</div>
                 <div class="story-text" id="story-desc"></div>
                 <button class="btn-continue" onclick="finishStoryAndNext()">NIVEAU SUIVANT ➜</button>
             </div>
@@ -293,20 +293,41 @@
     </div>
 
     <script>
-        // --- 12 CATÉGORIES ---
+        // --- DONNÉES ET HISTOIRES (RICH CONTENT) ---
+        
+        // Exemple de texte riche pour les premiers niveaux
+        const STORY_TASSILI = `
+            <p>Le Tassili n'Ajjer, situé au cœur du Sahara algérien, est un vaste plateau gréseux aux allures de paysage lunaire. L'érosion y a sculpté d'étranges forêts de pierre, formant des arches naturelles monumentales et des canyons profonds qui défient l'imagination.</p>
+            <p>Ce site exceptionnel est également le plus grand musée d'art préhistorique à ciel ouvert du monde. Il abrite plus de 15 000 dessins et gravures datant du néolithique, témoignant d'une époque où le désert était une savane verdoyante peuplée d'une faune abondante et de populations pastorales.</p>
+            <p>Classé au patrimoine mondial de l'UNESCO, le Tassili est un trésor inestimable pour l'humanité. Ses paysages grandioses et ses mystères archéologiques attirent les voyageurs en quête d'aventure et de spiritualité dans le silence absolu du désert.</p>
+        `;
+
+        const STORY_COUSCOUS = `
+            <p>Le couscous est bien plus qu'un simple plat en Algérie ; c'est une véritable institution culinaire et un symbole de partage. Préparé à base de semoule de blé dur roulée à la main, il est cuit à la vapeur dans un couscoussier traditionnel pour obtenir des grains légers et moelleux.</p>
+            <p>Chaque région d'Algérie possède sa propre variante : sauce rouge piquante à l'Est, sauce blanche parfumée à la cannelle au Centre, ou encore garni de légumes variés et de viandes tendres. Il est le plat incontournable des vendredis, des fêtes religieuses et des grandes célébrations familiales.</p>
+            <p>Reconnu au patrimoine culturel immatériel de l'humanité par l'UNESCO, le couscous incarne l'hospitalité et la générosité du peuple algérien. Le déguster ensemble autour d'un grand plat commun renforce les liens sociaux et perpétue une tradition millénaire.</p>
+        `;
+
+        const STORY_CASBAH = `
+            <p>La Casbah d'Alger est une médina historique surplombant la baie, véritable labyrinthe de ruelles blanches et d'escaliers sinueux. Fondée sur les ruines de l'ancienne Icosium, elle est le cœur battant de la capitale et un chef-d'œuvre de l'architecture islamique et ottomane.</p>
+            <p>Ses maisons traditionnelles, organisées autour de patios intérieurs (wast-ed-dar), sont conçues pour préserver l'intimité et la fraîcheur. La Casbah abrite également de magnifiques palais, des mosquées séculaires comme Ketchaoua, et des hammams qui témoignent d'un art de vivre raffiné.</p>
+            <p>Haut lieu de la mémoire nationale, la Casbah a joué un rôle central durant la Bataille d'Alger. Aujourd'hui classée par l'UNESCO, elle reste un symbole vibrant de l'identité algérienne, mêlant histoire, culture et vie quotidienne dans un décor enchanteur.</p>
+        `;
+
+        // 12 Catégories
         const baseCategories = [
-            { id: 'nature', title: "SITES NATURELS", img: "https://loremflickr.com/400/300/landscape,algeria", key: "nature" },
-            { id: 'history', title: "HISTOIRE & RUINES", img: "https://loremflickr.com/400/300/ruins,roman", key: "ruins" },
-            { id: 'culture', title: "CULTURE", img: "https://loremflickr.com/400/300/culture,art", key: "culture" },
-            { id: 'food', title: "GASTRONOMIE", img: "https://loremflickr.com/400/300/food,couscous", key: "food" },
-            { id: 'arch', title: "ARCHITECTURE", img: "https://loremflickr.com/400/300/building,architecture", key: "architecture" },
-            { id: 'wild', title: "FAUNE", img: "https://loremflickr.com/400/300/animal,wildlife", key: "animal" },
-            { id: 'sahara', title: "SAHARA", img: "https://loremflickr.com/400/300/desert,sand", key: "sahara" },
-            { id: 'sea', title: "MÉDITERRANÉE", img: "https://loremflickr.com/400/300/sea,beach", key: "sea" },
-            { id: 'craft', title: "ARTISANAT", img: "https://loremflickr.com/400/300/craft,pottery", key: "craft" },
-            { id: 'tradition', title: "TRADITIONS", img: "https://loremflickr.com/400/300/people,tradition", key: "tradition" },
-            { id: 'cities', title: "VILLES ANCIENNES", img: "https://loremflickr.com/400/300/city,old", key: "city" },
-            { id: 'mosaic', title: "MOSAÏQUES", img: "https://loremflickr.com/400/300/mosaic,pattern", key: "mosaic" }
+            { id: 'nature', title: "SITES NATURELS", img: "https://loremflickr.com/400/300/landscape,algeria", key: "nature", sampleStory: STORY_TASSILI },
+            { id: 'history', title: "SITES HISTORIQUES", img: "https://loremflickr.com/400/300/ruins,roman", key: "ruins", sampleStory: STORY_CASBAH },
+            { id: 'culture', title: "CULTURE & ART", img: "https://loremflickr.com/400/300/culture,art", key: "culture", sampleStory: "L'artisanat algérien est riche..." },
+            { id: 'food', title: "GASTRONOMIE", img: "https://loremflickr.com/400/300/food,couscous", key: "food", sampleStory: STORY_COUSCOUS },
+            { id: 'arch', title: "ARCHITECTURE", img: "https://loremflickr.com/400/300/architecture,building", key: "building", sampleStory: STORY_CASBAH },
+            { id: 'wild', title: "FAUNE & FLORE", img: "https://loremflickr.com/400/300/animal,wildlife", key: "animal", sampleStory: "La faune algérienne est diverse..." },
+            { id: 'sahara', title: "SAHARA", img: "https://loremflickr.com/400/300/desert,sand", key: "sahara", sampleStory: STORY_TASSILI },
+            { id: 'sea', title: "MÉDITERRANÉE", img: "https://loremflickr.com/400/300/sea,beach", key: "sea", sampleStory: "Les côtes algériennes..." },
+            { id: 'craft', title: "ARTISANAT", img: "https://loremflickr.com/400/300/craft,pottery", key: "craft", sampleStory: "La poterie kabyle..." },
+            { id: 'tradition', title: "TRADITIONS", img: "https://loremflickr.com/400/300/people,tradition", key: "tradition", sampleStory: "Les mariages traditionnels..." },
+            { id: 'cities', title: "VILLES ANCIENNES", img: "https://loremflickr.com/400/300/city,old", key: "city", sampleStory: STORY_CASBAH },
+            { id: 'mosaic', title: "MOSAÏQUES", img: "https://loremflickr.com/400/300/mosaic,pattern", key: "mosaic", sampleStory: "L'art du zellige..." }
         ];
 
         // Générateur de 50 niveaux
@@ -314,10 +335,23 @@
         baseCategories.forEach(cat => {
             const levels = [];
             for (let i = 0; i < 50; i++) {
+                // Progression difficulté : 9, 12, 16, 20, 25, 30...
+                let pieces = 9;
+                if (i > 5) pieces = 12;
+                if (i > 10) pieces = 16;
+                if (i > 20) pieces = 20;
+                if (i > 30) pieces = 25;
+                if (i > 40) pieces = 36;
+
+                // Pour la démo, le niveau 1 a le texte riche, les autres un texte générique
+                let txt = (i === 0) ? cat.sampleStory : `<p>Découvrez ce lieu magnifique de la catégorie <strong>${cat.title}</strong>.</p><p>Une image vaut mille mots. Ce puzzle vous révèle un aspect caché de notre patrimoine.</p><p>Continuez votre exploration pour débloquer les secrets des niveaux suivants !</p>`;
+
                 levels.push({
-                    pieces: 9 + Math.floor(i/5)*3,
+                    pieces: pieces,
+                    title: `${cat.title} - ${i + 1}`,
+                    loc: "ALGÉRIE",
                     key: `${cat.key},algeria`,
-                    story: `<p>Félicitations pour avoir terminé ce puzzle de la catégorie <strong>${cat.title}</strong>.</p><p>Chaque pièce assemblée révèle un peu plus la beauté de notre patrimoine.</p>`
+                    story: txt
                 });
             }
             gameData[cat.id] = { ...cat, levels: levels };
@@ -361,6 +395,7 @@
                 const locked = i > progress;
                 const div = document.createElement('div');
                 div.className = `level-card ${locked ? 'locked' : ''}`;
+                // Signature unique pour l'image
                 const imgUrl = `https://loremflickr.com/200/200/${lvl.key}?lock=${i}`;
                 div.innerHTML = `<img src="${imgUrl}" class="card-img" loading="lazy">`;
                 
@@ -375,21 +410,35 @@
         function backToLevels() { hideAll(); document.getElementById('level-select-screen').classList.remove('hidden'); }
         function hideAll() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); }
 
-        // --- MOTEUR DE JEU (FIXE VISIBILITÉ) ---
+        // --- MOTEUR DE JEU ---
+        function getDifficulty(count) {
+            if(count <= 12) return { label: "NIVEAU FACILE", color: "var(--diff-easy)" };
+            if(count <= 20) return { label: "NIVEAU MOYEN", color: "var(--diff-med)" };
+            if(count <= 30) return { label: "NIVEAU DIFFICILE", color: "var(--diff-hard)" };
+            return { label: "NIVEAU EXTRÊME", color: "var(--diff-ext)" };
+        }
+
         function launchLevel(idx) {
             currentLevelIdx = idx;
             hideAll();
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('btn-victory').style.display = 'none';
-            document.getElementById('game-title').innerText = `NIVEAU ${idx+1}`;
-
+            
             const lvl = currentCategory.levels[idx];
+            
+            // TITRE & DIFFICULTÉ
+            document.getElementById('game-title').innerText = lvl.title;
+            const diff = getDifficulty(lvl.pieces);
+            const badge = document.getElementById('diff-badge');
+            badge.innerText = diff.label;
+            badge.style.backgroundColor = diff.color;
+
+            // PLATEAU
             const area = document.getElementById('game-area');
             const board = document.getElementById('board');
             board.innerHTML = "";
 
-            // CALCUL DIMENSIONS
-            const w = area.clientWidth - 30; // Marge
+            const w = area.clientWidth - 30; 
             const h = area.clientHeight - 30;
             const ratio = w / h;
             
@@ -446,7 +495,7 @@
             if(p.classList.contains('locked')) return;
             draggedPiece = p; startX = e.clientX; startY = e.clientY;
             
-            // Passer en absolute pour le drag
+            // Absolute pendant le drag pour pas déformer le layout
             p.style.position = 'fixed';
             p.style.width = slotSize + 'px';
             p.style.height = slotSize + 'px';
@@ -464,13 +513,11 @@
         function dragEnd(e) {
             if(!draggedPiece) return;
             const p = draggedPiece;
-            
             p.classList.remove('dragging');
             p.releasePointerCapture(e.pointerId);
             p.removeEventListener('pointermove', dragMove);
             p.removeEventListener('pointerup', dragEnd);
 
-            // Reset styles
             p.style.position = 'absolute';
             p.style.left = '0'; p.style.top = '0';
             p.style.width = '100%'; p.style.height = '100%';
@@ -502,24 +549,18 @@
         }
         function checkWin() {
             if (document.querySelectorAll('.puzzle-piece.locked').length === cols*rows) {
-                setTimeout(showVictory, 600);
+                launchConfetti();
+                setTimeout(openRewardModal, 1500); // Délai pour voir le confetti
             }
         }
 
         // --- VICTOIRE & CONFETTIS ---
-        function showVictory() {
-            launchConfetti(); // Lance les confettis
-            openRewardModal();
-        }
-
         function launchConfetti() {
             const container = document.getElementById('confetti-container');
             container.style.display = 'block';
             container.innerHTML = '';
-            
-            const colors = ['#D60000', '#00802b', '#ffffff', '#FFD700']; // Couleurs DZ + Or
-            
-            for(let i=0; i<100; i++) {
+            const colors = ['#D60000', '#00802b', '#ffffff', '#FFD700'];
+            for(let i=0; i<150; i++) {
                 const conf = document.createElement('div');
                 conf.className = 'confetti';
                 conf.style.left = Math.random() * 100 + 'vw';
@@ -528,22 +569,18 @@
                 conf.style.top = -10 + 'px';
                 container.appendChild(conf);
             }
-            
-            // Nettoyage après 4s
-            setTimeout(() => { 
-                container.style.display = 'none'; 
-                container.innerHTML = ''; 
-            }, 4000);
+            setTimeout(() => { container.style.display = 'none'; container.innerHTML = ''; }, 5000);
         }
 
         // --- MODALES ---
         function openRewardModal() {
             const lvl = currentCategory.levels[currentLevelIdx];
-            document.getElementById('story-title-sub').innerText = `NIVEAU ${currentLevelIdx+1}`;
+            document.getElementById('story-location').innerText = lvl.title;
             document.getElementById('reward-img').src = currentImageUrl;
             document.getElementById('story-desc').innerHTML = lvl.story;
             document.getElementById('story-modal').classList.add('active');
         }
+        
         function finishStoryAndNext() {
             document.getElementById('story-modal').classList.remove('active');
             let saved = parseInt(localStorage.getItem(`pz_${currentCategory.id}`)) || 0;
@@ -551,6 +588,7 @@
             if(currentLevelIdx + 1 < currentCategory.levels.length) launchLevel(currentLevelIdx + 1);
             else backToLevels();
         }
+
         function openRefModal() {
             document.getElementById('ref-image').src = currentImageUrl;
             document.getElementById('ref-modal').classList.add('active');
