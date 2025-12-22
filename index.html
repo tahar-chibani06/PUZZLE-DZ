@@ -3,487 +3,495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUZZLE DZ - Trésors d'Algérie</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>PUZZLE DZ - Trésors d'Algerie </title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* --- THÈME ALGÉRIE SOMBRE --- */
-            --bg-gradient: radial-gradient(circle at center, #1a1a1a 0%, #0f2215 50%, #1a0505 100%);
-            --accent-color: #009933; 
-            --accent-gradient: linear-gradient(90deg, #009933, #00b33c);
+            --accent-green: #00802b;
             --accent-red: #D60000;
-            --text-color: #ffffff;
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --lock-color: var(--accent-color);
+            --text-dark: #1a1a1a;
+            --text-grey: #555555;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-color);
             margin: 0; padding: 0;
             height: 100vh; width: 100vw;
             overflow: hidden;
-            display: flex; flex-direction: column;
-            user-select: none;
-            touch-action: none;
+            color: var(--text-dark);
+            user-select: none; touch-action: none;
+            background: #f0f0f0; /* Fallback color */
         }
 
-        /* --- UI GÉNÉRALE --- */
+        /* FOND */
+        .bg-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1549650179-b769281203b9?q=80&w=1000&auto=format&fit=crop') center/cover no-repeat;
+            z-index: -1; filter: blur(12px) brightness(1.1); transform: scale(1.1);
+        }
+
+        /* SCREENS */
         .screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient);
-            display: flex; flex-direction: column;
-            z-index: 100; transition: opacity 0.4s ease, transform 0.4s ease;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 100; transition: opacity 0.3s ease;
+            overflow-y: auto; padding-bottom: 20px;
         }
-        .screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); z-index: -1; }
+        .screen.hidden { opacity: 0; pointer-events: none; z-index: -1; }
 
-        /* Splash */
-        #splash-screen { justify-content: center; align-items: center; z-index: 200; }
+        /* 1. ACCUEIL */
+        #splash-screen { justify-content: center; }
+        .logo-box {
+            background: var(--glass-bg); padding: 40px; border-radius: 25px;
+            box-shadow: var(--shadow); text-align: center; width: 90%; max-width: 400px;
+        }
         .title-dz {
-            font-size: 3rem; font-weight: 900;
-            background: linear-gradient(90deg, var(--accent-color) 30%, #ffffff 50%, var(--accent-red) 70%);
+            font-size: 3rem; font-weight: 900; margin: 0;
+            background: linear-gradient(90deg, var(--accent-green), #2c3e50, var(--accent-red));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-transform: uppercase; letter-spacing: 4px; margin: 0;
-            text-shadow: 0 5px 20px rgba(0, 153, 51, 0.3); text-align: center;
+            text-transform: uppercase; letter-spacing: 3px;
         }
-        .subtitle { font-size: 0.9rem; color: #a8a8b3; margin-top: 10px; letter-spacing: 2px; text-align: center; }
-        .btn-start {
-            margin-top: 40px; padding: 15px 50px; font-size: 1.1rem; font-weight: 700;
-            color: white; background: var(--accent-gradient); border: none; border-radius: 50px;
-            cursor: pointer; box-shadow: 0 0 20px rgba(0, 153, 51, 0.4);
+        .btn-main {
+            margin-top: 30px; padding: 15px 0; width: 100%; font-size: 1.1rem; font-weight: 700;
+            color: white; background: linear-gradient(45deg, var(--accent-green), #00b33c);
+            border: none; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3);
         }
-        .footer-credit { position: absolute; bottom: 20px; font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); letter-spacing: 1px; font-weight: 700; }
-        .footer-credit span { color: var(--accent-red); }
 
-        /* Level Select */
-        #level-select-screen { align-items: center; padding-top: 20px; overflow-y: auto; }
-        .level-header { font-size: 1.5rem; color: var(--accent-color); font-weight: 800; margin-bottom: 20px; letter-spacing: 2px; }
-        .level-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 90%; max-width: 600px; padding-bottom: 50px; }
+        /* 2. CATÉGORIES (12 ITEMS) */
+        #category-screen { padding-top: 20px; }
+        .screen-header { 
+            font-size: 1.5rem; font-weight: 900; margin: 20px 0; 
+            text-transform: uppercase; color: var(--text-dark);
+            text-shadow: 0 2px 20px rgba(255,255,255,0.8);
+        }
+
+        .category-list {
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; width: 95%; max-width: 500px; padding-bottom: 50px;
+        }
+
+        .cat-card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; 
+            border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
+        }
+        .cat-card:active { transform: scale(0.96); }
+        .cat-img { height: 80px; object-fit: cover; width: 100%; background: #ddd; }
+        .cat-info { padding: 10px; text-align: center; }
+        .cat-title { font-weight: 800; font-size: 0.75rem; color: var(--text-dark); text-transform: uppercase; margin-bottom: 2px;}
+        .cat-count { font-size: 0.65rem; color: var(--accent-green); font-weight: 700; }
+
+        /* 3. NIVEAUX */
+        .top-bar {
+            width: 95%; max-width: 600px; display: flex; justify-content: space-between; align-items: center;
+            margin: 15px 0;
+        }
+        .btn-round {
+            background: white; border: none; width: 40px; height: 40px; border-radius: 50%;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1); cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-weight: 800; color: var(--text-dark); font-size: 1.2rem;
+        }
+        .level-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
+            width: 95%; max-width: 500px; padding-bottom: 50px;
+        }
         .level-card {
-            aspect-ratio: 1 / 1; background: #000; border-radius: 12px;
-            border: 2px solid var(--glass-border); position: relative; overflow: hidden;
-            cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            aspect-ratio: 1; background: white; border-radius: 8px;
+            position: relative; overflow: hidden; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .level-card:active { transform: scale(0.95); }
-        .level-card.locked { border-color: var(--accent-red); opacity: 0.7; }
-        .level-card.locked .card-img { filter: blur(8px) grayscale(80%); }
+        .level-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; background: #eee; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
-        .card-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.3);
+        .level-num {
+            position: absolute; bottom: 0; right: 0; background: rgba(0,0,0,0.6);
+            color: white; font-weight: 700; font-size: 0.8rem; padding: 2px 6px;
+            border-top-left-radius: 6px;
         }
-        .card-number { font-size: 2rem; font-weight: 900; color: white; text-shadow: 0 2px 10px black; }
-        .lock-icon { width: 40px; height: 40px; fill: var(--accent-red); filter: drop-shadow(0 0 5px black); }
 
-        /* Game Area */
+        /* 4. JEU (CORRECTIF VISIBILITÉ) */
+        #game-screen { overflow: hidden; height: 100vh; width: 100vw; background: rgba(255,255,255,0.2); }
+        
         header {
-            height: 60px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--glass-border); z-index: 10;
+            width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
         }
         .btn-menu {
-            background: transparent; border: 1px solid var(--glass-border); color: #ccc;
-            padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+            background: #f4f4f4; border: none; color: var(--text-dark);
+            padding: 8px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
         }
-        .level-badge {
-            background: rgba(0, 153, 51, 0.2); border: 1px solid var(--accent-color);
-            padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; color: white;
-        }
-        .btn-eye {
-            background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: white;
-            width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-        }
-        .btn-eye svg { width: 20px; fill: white; }
+        .level-title-game { font-size: 0.8rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .game-area {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-            width: 100%; position: relative; padding: 20px; box-sizing: border-box;
+            flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; padding: 15px;
         }
 
         .puzzle-board {
-            display: grid; gap: 0;
-            position: relative; 
-            /* On enlève le fond du board pour ne pas voir de lignes derrière les fusions */
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            /* Le JS va définir la taille */
+            display: grid; gap: 1px; 
+            background: rgba(255,255,255,0.8); /* Fond blanc pour voir les trous */
+            border: 4px solid white;
+            border-radius: 4px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
         }
 
         .puzzle-slot { 
-            width: 100%; height: 100%; position: relative; pointer-events: none;
-            /* Grille très légère pour aider, disparait sous la pièce */
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05); 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.03); 
+            position: relative; 
         }
 
-        /* --- PIÈCES JIGSAW SVG --- */
+        /* PIÈCES : FIX POSITION */
         .puzzle-piece {
-            /* 126% pour un léger chevauchement qui cache les pixels de jointure */
-            width: 126%; height: 126%;
-            position: absolute; top: -13%; left: -13%;
-            cursor: grab;
-            z-index: 10;
-            transition: transform 0.1s ease-out;
-            /* Ombre portée pour le relief des pièces NON fixées */
-            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
-            pointer-events: auto;
+            width: 100%; height: 100%; 
+            cursor: grab; 
+            background-repeat: no-repeat;
+            background-color: #ccc; /* Fallback si image charge pas */
+            
+            /* Position relative par défaut pour rester dans le slot */
+            position: relative; 
+            z-index: 1;
+            
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+            border-radius: 2px;
+            transition: transform 0.1s;
         }
 
-        .puzzle-piece svg { width: 100%; height: 100%; overflow: visible; }
-        
-        /* Contour de la pièce */
-        .puzzle-piece path {
-            fill: none;
-            stroke: rgba(255,255,255,0.3); /* Bordure légère */
-            stroke-width: 1px;
-            vector-effect: non-scaling-stroke;
-            transition: stroke 0.3s, stroke-width 0.3s;
-        }
-
-        /* Dragging */
+        /* Quand on drag, on utilise fixed ou absolute par rapport au body pour pas être coupé */
+        /* Mais ici, on garde transform translate qui est performant */
         .puzzle-piece.dragging {
-            z-index: 1000 !important; transition: none;
+            z-index: 1000 !important; 
+            opacity: 0.9;
+            transition: none !important; 
+            box-shadow: 0 0 0 2px var(--accent-red), 0 15px 30px rgba(0,0,0,0.4) !important;
             transform: scale(1.1);
-            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.6));
-        }
-        .puzzle-piece.dragging path { stroke: var(--accent-red); stroke-width: 3px; }
-
-        /* --- ÉTAT VERROUILLÉ (FUSION) --- */
-        .puzzle-piece.locked {
-            cursor: default !important; 
-            z-index: 1; /* Reste en bas */
-            filter: none !important; /* SUPPRIME L'OMBRE PORTÉE */
-            transform: none !important; /* Assure qu'elle est bien à plat */
-        }
-        /* SUPPRIME LE TRAIT DE CONTOUR -> FUSION VISUELLE */
-        .puzzle-piece.locked path { 
-            stroke: none; 
-            stroke-width: 0; 
         }
 
-        /* Animation Flash au moment du lock */
-        @keyframes lockFlash {
-            0% { filter: brightness(2) drop-shadow(0 0 15px var(--lock-color)); }
-            100% { filter: none; }
+        .puzzle-piece.locked { 
+            cursor: default; z-index: 0; box-shadow: none !important; border:none; 
+            filter: brightness(1.05); /* Petit pop visuel */
         }
-        .just-locked { animation: lockFlash 0.5s ease-out; }
+        
+        @keyframes flash { 0% { filter: brightness(1); } 50% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
+        .just-locked { animation: flash 0.4s; }
 
-        /* Modales & Story */
+        /* MODALES */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); z-index: 5000;
+            background: rgba(255,255,255,0.9); z-index: 5000;
             display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content {
-            max-width: 90%; max-height: 80%; border: 1px solid var(--accent-color);
-            border-radius: 12px; box-shadow: 0 0 40px rgba(0, 153, 51, 0.2); 
-            background: #121a15; overflow: hidden; transform: scale(0.9); transition: transform 0.3s;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-img { display: block; max-width: 100%; max-height: 70vh; object-fit: contain; }
-
-        .story-container { padding: 25px; text-align: center; color: white; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-        .reward-image-container { margin: 20px 0; border-radius: 8px; overflow: hidden; border: 2px solid var(--accent-red); box-shadow: 0 0 30px rgba(214, 0, 0, 0.3); }
-        .reward-img { width: 100%; height: auto; display: block; }
-        .story-title { color: var(--accent-color); font-size: 1.4rem; margin: 10px 0; font-weight: 900;}
-        .story-location { color: #aaaaaa; font-size: 1rem; margin-bottom: 20px; font-weight: 700;}
-        .story-text { font-size: 1rem; line-height: 1.6; color: #e0e0e0; margin-bottom: 30px; text-align: justify; }
-        .btn-continue {
-            padding: 12px 40px; background: var(--accent-gradient); color: white;
-            border: none; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%;
-        }
-
-        .btn-next {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            padding: 12px 40px; background: var(--accent-gradient); color: white; border: none; border-radius: 50px;
-            font-weight: 700; box-shadow: 0 5px 20px rgba(0, 153, 51, 0.5); display: none; z-index: 2000;
-            animation: popIn 0.5s;
-        }
-        @keyframes popIn { from { transform: translateX(-50%) scale(0); } to { transform: translateX(-50%) scale(1); } }
         
-        .hidden { display: none !important; }
+        .modal-content {
+            width: 90%; max-width: 500px; max-height: 90%; background: white;
+            border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden; display: flex; flex-direction: column; align-items: center;
+            border: 1px solid #eee;
+        }
+        .modal-img { display: block; max-width: 100%; max-height: 50vh; object-fit: contain; }
+        .story-container { padding: 25px; text-align: center; overflow-y: auto; width: 100%; }
+        
+        .story-title { color: var(--accent-green); font-size: 1.4rem; font-weight: 800; margin: 0; }
+        .story-text { font-size: 0.95rem; line-height: 1.6; color: #333; margin-top: 15px; text-align: justify; }
+        
+        .btn-victory {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 30px; background: var(--accent-green); color: white; border: none; border-radius: 50px;
+            font-weight: 700; box-shadow: 0 5px 15px rgba(0, 128, 43, 0.3); display: none; z-index: 2000;
+        }
+        .btn-continue {
+            margin-top: 20px; padding: 15px 0; width: 100%; background: var(--accent-green); 
+            color: white; border: none; border-radius: 50px; font-weight: 700; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
+    <div class="bg-layer"></div>
+
     <div id="splash-screen" class="screen">
-        <div class="logo-container">
+        <div style="flex:1"></div>
+        <div class="logo-box">
             <h1 class="title-dz">PUZZLE DZ</h1>
-            <p class="subtitle">DÉCOUVREZ LES TRÉSORS D'ALGÉRIE</p>
+            <p class="subtitle">AUTHENTIC ALGERIA</p>
+            <button class="btn-main" onclick="showCategories()">JOUER</button>
         </div>
-        <button class="btn-start" onclick="goToLevelSelect()">JOUER</button>
-        <div class="footer-credit">Created by : <span>ASSSIREM MEDIA</span></div>
+        <div style="flex:1"></div>
+        <div style="margin-bottom: 20px; font-size: 0.8rem; font-weight:700; color:#333; opacity:0.8;">Created by <span style="color:var(--accent-red)">ASSSIREM MEDIA</span></div>
+    </div>
+
+    <div id="category-screen" class="screen hidden">
+        <div class="screen-header">12 THÈMES</div>
+        <div class="category-list" id="category-list"></div>
     </div>
 
     <div id="level-select-screen" class="screen hidden">
-        <div class="level-header">VOS DESTINATIONS</div>
+        <div class="top-bar">
+            <button class="btn-round" onclick="showCategories()">❮</button>
+            <div style="color:var(--text-dark); font-weight:800; font-size:1.1rem;" id="cat-title-display">TITRE</div>
+            <div style="width:45px"></div>
+        </div>
         <div class="level-grid" id="level-grid"></div>
     </div>
 
     <div id="game-screen" class="screen hidden">
-        <header id="game-header">
-            <button class="btn-menu" onclick="goToLevelSelect()">☰ MENU</button>
-            <div class="level-badge" id="level-indicator">NIVEAU 1</div>
-            <button class="btn-eye" onclick="openRefModal()">
-                <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            </button>
+        <header>
+            <button class="btn-menu" onclick="backToLevels()">❮ RETOUR</button>
+            <div class="level-title-game" id="game-title">TITRE</div>
+            <button class="btn-menu" onclick="openRefModal()">👁️</button>
         </header>
 
         <div class="game-area" id="game-area">
             <div id="board" class="puzzle-board"></div>
         </div>
 
-        <button id="btn-next" class="btn-next" onclick="openRewardModal()">NIVEAU TERMINÉ ➜</button>
+        <button id="btn-victory" class="btn-victory" onclick="openRewardModal()">NIVEAU TERMINÉ ➜</button>
     </div>
 
-    <div id="ref-modal" class="modal-overlay" onclick="closeRefModal(event)">
-        <div class="modal-content"><img id="ref-image" class="modal-img" src="" alt="Reference"></div>
+    <div id="ref-modal" class="modal-overlay" onclick="closeModal('ref-modal')">
+        <div class="modal-content"><img id="ref-image" class="modal-img" src=""></div>
     </div>
 
     <div id="story-modal" class="modal-overlay">
-        <div class="modal-content story-container">
-            <h2 class="story-title" id="story-title">Titre</h2>
-            <div class="story-location" id="story-location">Lieu</div>
-            <div class="reward-image-container"><img id="reward-img" class="reward-img" src="" alt="Reward"></div>
-            <div class="story-text" id="story-desc"></div>
-            <button class="btn-continue" onclick="finishStoryAndNext()">NIVEAU SUIVANT ➜</button>
+        <div class="modal-content">
+            <img id="reward-img" class="modal-img" src="" style="width:100%; object-fit:cover;">
+            <div class="story-container">
+                <h2 class="story-title" id="story-title"></h2>
+                <div class="story-text" id="story-desc"></div>
+                <button class="btn-continue" onclick="finishStoryAndNext()">CONTINUER</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const levelsData = [
-            { pieces: 12, title: "CAP CARBON", location: "BÉJAÏA", keyword: "cliff,lighthouse", story: "Surplombant la Méditerranée, le Cap Carbon abrite le phare naturel le plus haut du monde.<br><br>Un lieu magique où les singes magots observent les navires passer au loin." },
-            { pieces: 16, title: "TASSILI N'AJJER", location: "DJANET", keyword: "sahara,rock", story: "Un musée à ciel ouvert. Ce paysage lunaire raconte l'histoire de l'humanité à travers ses gravures rupestres millénaires.<br><br>Les formations rocheuses créent une véritable forêt de pierre unique au monde." },
-            { pieces: 20, title: "CANYON DE GHOUFI", location: "BATNA", keyword: "canyon,valley", story: "Surnommé le « Colorado Algérien ». Les balcons du Ghoufi offrent une vue spectaculaire sur l'oued Abiod.<br><br>Les maisons troglodytes accrochées à la falaise témoignent d'un mode de vie ancestral." },
-            { pieces: 24, title: "TIKJDA", location: "BOUIRA", keyword: "mountain,snow", story: "Au cœur du Djurdjura, Tikjda offre des paysages alpins époustouflants.<br><br>Entre forêts de cèdres et sommets enneigés, c'est le paradis des randonneurs et skieurs." },
-            { pieces: 30, title: "OASIS DE TAGHIT", location: "BÉCHAR", keyword: "oasis,dunes", story: "La perle de la Saoura. Des dunes dorées majestueuses qui embrassent une palmeraie verdoyante.<br><br>Le vieux Ksar en terre rouge veille sur l'oued depuis des siècles." },
-            { pieces: 35, title: "GROTTES MERVEILLEUSES", location: "JIJEL", keyword: "cave,stalactite", story: "Un chef-d'œuvre souterrain sculpté par l'eau. Les stalactites forment des sculptures naturelles fascinantes.<br><br>La température y reste fraîche toute l'année, un contraste saisissant avec la chaleur extérieure." },
-            { pieces: 40, title: "ASSEKREM", location: "TAMANRASSET", keyword: "volcano,sunset", story: "Le toit du Sahara. Au lever du soleil, les pics du Hoggar s'embrasent.<br><br>C'est ici que Charles de Foucauld a trouvé la paix absolue, face à l'un des plus beaux panoramas du monde." },
-            { pieces: 48, title: "MONT CHENOUA", location: "TIPAZA", keyword: "sea,mountain", story: "Là où la montagne plonge dans la mer. Un lieu mythique mêlant nature sauvage et histoire.<br><br>La route côtière offre des criques secrètes aux eaux turquoises." }
+        // --- 12 CATÉGORIES ---
+        const baseCategories = [
+            { id: 'nature', title: "SITES NATURELS", img: "https://loremflickr.com/400/300/nature,algeria", key: "nature" },
+            { id: 'history', title: "HISTOIRE & RUINES", img: "https://loremflickr.com/400/300/ruins,roman", key: "history" },
+            { id: 'culture', title: "CULTURE", img: "https://loremflickr.com/400/300/culture,art", key: "culture" },
+            { id: 'food', title: "GASTRONOMIE", img: "https://loremflickr.com/400/300/food,couscous", key: "food" },
+            { id: 'arch', title: "ARCHITECTURE", img: "https://loremflickr.com/400/300/architecture,building", key: "architecture" },
+            { id: 'wild', title: "FAUNE", img: "https://loremflickr.com/400/300/animal,wildlife", key: "animal" },
+            { id: 'sahara', title: "SAHARA", img: "https://loremflickr.com/400/300/desert,sand", key: "sahara" },
+            { id: 'sea', title: "MÉDITERRANÉE", img: "https://loremflickr.com/400/300/sea,beach", key: "sea" },
+            { id: 'craft', title: "ARTISANAT", img: "https://loremflickr.com/400/300/craft,pottery", key: "craft" },
+            { id: 'tradition', title: "TRADITIONS", img: "https://loremflickr.com/400/300/people,tradition", key: "tradition" },
+            { id: 'cities', title: "VILLES ANCIENNES", img: "https://loremflickr.com/400/300/city,old", key: "city" },
+            { id: 'mosaic', title: "MOSAÏQUES", img: "https://loremflickr.com/400/300/mosaic,pattern", key: "mosaic" }
         ];
 
-        let currentLevel = 0, cols = 0, rows = 0, slotW = 0, slotH = 0;
-        let currentImageUrl = "", maxUnlockedLevel = 0;
-        let jigsawShapes = [], draggedPiece = null, isDragging = false, startX = 0, startY = 0;
+        // Générateur de 50 niveaux
+        const gameData = {};
+        baseCategories.forEach(cat => {
+            const levels = [];
+            for (let i = 0; i < 50; i++) {
+                levels.push({
+                    pieces: 9 + Math.floor(i/5)*3,
+                    key: `${cat.key},algeria`,
+                    story: `<p>Bravo ! Vous avez terminé ce puzzle de la catégorie <strong>${cat.title}</strong>.</p><p>Explorez les 50 niveaux pour découvrir toute la richesse de l'Algérie, des côtes de la Méditerranée aux dunes du Sahara.</p><p>Chaque image raconte une histoire unique de notre patrimoine.</p>`
+                });
+            }
+            gameData[cat.id] = { ...cat, levels: levels };
+        });
 
-        window.onload = () => {
-            const saved = localStorage.getItem('puzzleDZ_progress');
-            if (saved) maxUnlockedLevel = parseInt(saved);
-        };
+        // --- ETAT ---
+        let currentCategory = null, currentLevelIdx = 0;
+        let cols = 0, rows = 0, slotSize = 0, currentImageUrl = "";
+        let draggedPiece = null, startX = 0, startY = 0;
 
-        function goToLevelSelect() {
-            document.getElementById('splash-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('level-select-screen').classList.remove('hidden');
-            renderLevelGrid();
+        // --- NAVIGATION ---
+        function showCategories() {
+            hideAll();
+            document.getElementById('category-screen').classList.remove('hidden');
+            const list = document.getElementById('category-list');
+            list.innerHTML = "";
+            for(let key in gameData) {
+                const c = gameData[key];
+                const div = document.createElement('div');
+                div.className = "cat-card";
+                div.onclick = () => selectCategory(key);
+                div.innerHTML = `<img src="${c.img}" class="cat-img"><div class="cat-info"><div class="cat-title">${c.title}</div><div class="cat-count">50 Niveaux</div></div>`;
+                list.appendChild(div);
+            }
         }
 
-        function renderLevelGrid() {
+        function selectCategory(key) {
+            currentCategory = gameData[key];
+            hideAll();
+            document.getElementById('level-select-screen').classList.remove('hidden');
+            document.getElementById('cat-title-display').innerText = currentCategory.title;
+            renderLevels();
+        }
+
+        function renderLevels() {
             const grid = document.getElementById('level-grid');
             grid.innerHTML = "";
-            levelsData.forEach((level, index) => {
-                const isLocked = index > maxUnlockedLevel;
-                const card = document.createElement('div');
-                card.className = `level-card ${isLocked ? 'locked' : 'unlocked'}`;
-                const thumbUrl = `https://loremflickr.com/300/300/${level.keyword}?random=${index}`;
-                let content = `<img src="${thumbUrl}" class="card-img">`;
-                if (isLocked) content += `<div class="card-overlay"><svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>`;
-                else { content += `<div class="card-overlay"><div class="card-number">${index + 1}</div></div>`; card.onclick = () => loadLevel(index); }
-                card.innerHTML = content; grid.appendChild(card);
+            const progress = parseInt(localStorage.getItem(`pz_${currentCategory.id}`)) || 0;
+            
+            currentCategory.levels.forEach((lvl, i) => {
+                const locked = i > progress;
+                const div = document.createElement('div');
+                div.className = `level-card ${locked ? 'locked' : ''}`;
+                const imgUrl = `https://loremflickr.com/200/200/${lvl.key}?lock=${i}`;
+                div.innerHTML = `<img src="${imgUrl}" class="card-img" loading="lazy">`;
+                
+                if(!locked) {
+                    div.innerHTML += `<div class="level-num">${i+1}</div>`;
+                    div.onclick = () => launchLevel(i);
+                }
+                grid.appendChild(div);
             });
         }
 
-        function loadLevel(index) {
-            currentLevel = index;
-            const data = levelsData[index];
-            document.getElementById('level-select-screen').classList.add('hidden');
+        function backToLevels() { hideAll(); document.getElementById('level-select-screen').classList.remove('hidden'); }
+        function hideAll() { document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden')); }
+
+        // --- MOTEUR DE JEU (FIXE) ---
+        function launchLevel(idx) {
+            currentLevelIdx = idx;
+            hideAll();
             document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('btn-victory').style.display = 'none';
+            document.getElementById('game-title').innerText = `NIVEAU ${idx+1}`;
 
-            const board = document.getElementById('board');
+            const lvl = currentCategory.levels[idx];
             const area = document.getElementById('game-area');
+            const board = document.getElementById('board');
             board.innerHTML = "";
-            document.getElementById('btn-next').style.display = "none";
-            document.getElementById('level-indicator').innerText = `NIVEAU ${index + 1}`;
 
-            const w = area.clientWidth; const h = area.clientHeight;
-            const grid = calcGrid(data.pieces, w, h);
-            cols = grid.cols; rows = grid.rows;
-
-            slotW = Math.floor(Math.min((w * 0.9) / cols, (h * 0.9) / rows));
-            slotH = slotW; 
+            // CALCUL DIMENSIONS
+            const w = area.clientWidth - 30; // Marge
+            const h = area.clientHeight - 30;
+            const ratio = w / h;
             
-            board.style.width = `${slotW * cols}px`; board.style.height = `${slotH * rows}px`;
+            let bestC = 1, bestR = lvl.pieces, bestDiff = 999;
+            for(let c=1; c<=lvl.pieces; c++) {
+                if(lvl.pieces % c === 0) {
+                    let r = lvl.pieces / c;
+                    let diff = Math.abs((c/r) - ratio);
+                    if(diff < bestDiff) { bestDiff = diff; bestC = c; bestR = r; }
+                }
+            }
+            cols = bestC; rows = bestR;
+            slotSize = Math.floor(Math.min(w / cols, h / rows));
+
+            board.style.width = `${slotSize * cols}px`;
+            board.style.height = `${slotSize * rows}px`;
             board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
 
-            currentImageUrl = `https://loremflickr.com/${slotW*cols}/${slotH*rows}/${data.keyword}?random=${index}`;
-            generateJigsawShapes();
+            currentImageUrl = `https://loremflickr.com/${slotSize*cols}/${slotSize*rows}/${lvl.key}?lock=${idx}`;
 
-            let order = Array.from({length: data.pieces}, (_, i) => i);
+            let order = Array.from({length: lvl.pieces}, (_, i) => i);
             order.sort(() => Math.random() - 0.5);
 
-            for (let i = 0; i < data.pieces; i++) {
+            for (let i = 0; i < lvl.pieces; i++) {
                 let slot = document.createElement('div');
                 slot.className = 'puzzle-slot';
-                slot.dataset.idx = i; 
-                const pid = order[i];
-                const piece = createPiece(pid, currentImageUrl, cols, rows);
+                slot.dataset.idx = i;
+                
+                let piece = document.createElement('div');
+                piece.className = 'puzzle-piece';
+                let pid = order[i];
+                piece.dataset.id = pid;
+                
+                let cx = pid % cols; let cy = Math.floor(pid / cols);
+                piece.style.backgroundImage = `url(${currentImageUrl})`;
+                piece.style.backgroundSize = `${cols*100}% ${rows*100}%`;
+                piece.style.backgroundPosition = `${(cx/(cols-1))*100}% ${(cy/(rows-1))*100}%`;
+                if(cols===1) piece.style.backgroundPositionX="0%";
+                if(rows===1) piece.style.backgroundPositionY="0%";
+
+                piece.addEventListener('pointerdown', dragStart);
                 slot.appendChild(piece);
                 board.appendChild(slot);
-                checkIfPieceShouldLock(piece, slot);
-            }
-            checkWin();
-        }
-
-        function generateJigsawShapes() {
-            jigsawShapes = [];
-            for(let i=0; i<cols*rows; i++) {
-                let r = Math.floor(i / cols), c = i % cols;
-                let top = 0, right = 0, bottom = 0, left = 0;
-                if(c < cols - 1) right = Math.random() > 0.5 ? 1 : -1;
-                if(r < rows - 1) bottom = Math.random() > 0.5 ? 1 : -1;
-                if(c > 0) left = -jigsawShapes[i-1].right;
-                if(r > 0) top = -jigsawShapes[i-cols].bottom;
-                jigsawShapes.push({ top, right, bottom, left });
+                
+                checkLock(piece, slot);
             }
         }
 
-        function createPiece(id, url, c, r) {
-            const p = document.createElement('div');
-            p.className = 'puzzle-piece';
-            p.dataset.realId = id; 
-            const shape = jigsawShapes[id];
-            
-            const svgNS = "http://www.w3.org/2000/svg";
-            const svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("viewBox", "-25 -25 150 150"); 
-
-            const pathData = getPuzzlePath(shape.top, shape.right, shape.bottom, shape.left);
-            
-            const defs = document.createElementNS(svgNS, "defs");
-            const clipPath = document.createElementNS(svgNS, "clipPath");
-            const clipID = `clip-${id}-${Math.random().toString(36).substr(2, 5)}`;
-            clipPath.setAttribute("id", clipID);
-            const path = document.createElementNS(svgNS, "path");
-            path.setAttribute("d", pathData);
-            clipPath.appendChild(path);
-            defs.appendChild(clipPath);
-            svg.appendChild(defs);
-
-            const image = document.createElementNS(svgNS, "image");
-            image.setAttributeNS("http://www.w3.org/1999/xlink", "href", url);
-            const cx = id % c, cy = Math.floor(id / c);
-            image.setAttribute("width", `${c * 100}`);
-            image.setAttribute("height", `${r * 100}`);
-            image.setAttribute("x", `${-cx * 100}`);
-            image.setAttribute("y", `${-cy * 100}`);
-            image.setAttribute("clip-path", `url(#${clipID})`);
-            svg.appendChild(image);
-
-            const borderPath = document.createElementNS(svgNS, "path");
-            borderPath.setAttribute("d", pathData);
-            svg.appendChild(borderPath);
-
-            p.appendChild(svg);
-            p.addEventListener('pointerdown', startDrag);
-            return p;
-        }
-
-        function getPuzzlePath(top, right, bottom, left) {
-            let d = `M 0 0 `;
-            d += top !== 0 ? curve(top, true) : `L 100 0 `;
-            d += right !== 0 ? curve(right, false) : `L 100 100 `;
-            d += bottom !== 0 ? curve(bottom, true, true) : `L 0 100 `;
-            d += left !== 0 ? curve(left, false, true) : `L 0 0 `;
-            return d;
-        }
-
-        function curve(type, horizontal, reverse = false) {
-            const s = reverse ? -1 : 1; 
-            const t = type * s; 
-            if (horizontal) {
-                const h = 25 * t; 
-                return !reverse ? `L 35 0 C 35 ${h}, 65 ${h}, 65 0 L 100 0 ` : `L 65 100 C 65 ${100+h}, 35 ${100+h}, 35 100 L 0 100 `;
-            } else {
-                const w = 25 * t; 
-                return !reverse ? `L 100 35 C ${100+w} 35, ${100+w} 65, 100 65 L 100 100 ` : `L 0 65 C ${w} 65, ${w} 35, 0 35 L 0 0 `;
-            }
-        }
-
-        function startDrag(e) {
+        // --- SWAP LOGIC ---
+        function dragStart(e) {
             e.preventDefault();
-            const piece = e.target.closest('.puzzle-piece');
-            if (piece.classList.contains('locked')) return;
-            draggedPiece = piece; isDragging = true; startX = e.clientX; startY = e.clientY;
-            piece.classList.add('dragging'); piece.setPointerCapture(e.pointerId);
-            document.addEventListener('pointermove', onDrag); document.addEventListener('pointerup', endDrag);
+            const p = e.target;
+            if(p.classList.contains('locked')) return;
+            draggedPiece = p; startX = e.clientX; startY = e.clientY;
+            p.classList.add('dragging'); p.setPointerCapture(e.pointerId);
+            p.addEventListener('pointermove', dragMove); p.addEventListener('pointerup', dragEnd);
         }
-        function onDrag(e) {
-            if (!isDragging || !draggedPiece) return;
+        function dragMove(e) {
+            if(!draggedPiece) return;
             draggedPiece.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
         }
-        function endDrag(e) {
-            if (!isDragging || !draggedPiece) return;
-            isDragging = false;
-            document.removeEventListener('pointermove', onDrag); document.removeEventListener('pointerup', endDrag);
-            const colShift = Math.round((e.clientX - startX) / slotW);
-            const rowShift = Math.round((e.clientY - startY) / slotW);
-            draggedPiece.classList.remove('dragging'); draggedPiece.style.transform = ''; draggedPiece.releasePointerCapture(e.pointerId);
-            if (colShift !== 0 || rowShift !== 0) tryMovePiece(draggedPiece, colShift, (rowShift * cols) + colShift);
-            draggedPiece = null;
-        }
-        function tryMovePiece(piece, cShift, iShift) {
-            const oldSlot = piece.parentNode; const oldIdx = parseInt(oldSlot.dataset.idx); const newIdx = oldIdx + iShift;
-            if (newIdx < 0 || newIdx >= (cols * rows) || (oldIdx % cols) + cShift !== (newIdx % cols)) return;
-            const targetSlot = document.querySelector(`.puzzle-slot[data-idx='${newIdx}']`);
-            const resident = targetSlot.children[0];
-            if (resident && resident.classList.contains('locked')) return;
-            if (resident) oldSlot.appendChild(resident);
-            targetSlot.appendChild(piece);
-            checkIfPieceShouldLock(piece, targetSlot); if (resident) checkIfPieceShouldLock(resident, oldSlot);
-            checkWin();
-        }
-        function checkIfPieceShouldLock(piece, slot) {
-            if (parseInt(piece.dataset.realId) === parseInt(slot.dataset.idx)) {
-                if (!piece.classList.contains('locked')) {
-                    piece.classList.add('locked', 'just-locked'); setTimeout(() => piece.classList.remove('just-locked'), 600);
+        function dragEnd(e) {
+            if(!draggedPiece) return;
+            draggedPiece.classList.remove('dragging'); draggedPiece.style.transform = '';
+            draggedPiece.releasePointerCapture(e.pointerId);
+            draggedPiece.removeEventListener('pointermove', dragMove);
+            draggedPiece.removeEventListener('pointerup', dragEnd);
+
+            draggedPiece.style.visibility = 'hidden';
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+            draggedPiece.style.visibility = 'visible';
+            
+            const targetSlot = el ? el.closest('.puzzle-slot') : null;
+            if (targetSlot && targetSlot !== draggedPiece.parentNode) {
+                const oldSlot = draggedPiece.parentNode;
+                const resident = targetSlot.children[0];
+                if (!resident || !resident.classList.contains('locked')) {
+                    if(resident) oldSlot.appendChild(resident);
+                    targetSlot.appendChild(draggedPiece);
+                    checkLock(draggedPiece, targetSlot);
+                    if(resident) checkLock(resident, oldSlot);
+                    checkWin();
                 }
             }
+            draggedPiece = null;
         }
 
-        function checkWin() {
-            const total = cols * rows;
-            if (document.querySelectorAll('.puzzle-piece.locked').length === total && total > 0) {
-                document.getElementById('board').style.borderColor = "var(--accent-color)";
-                document.getElementById('btn-next').style.display = "block";
+        function checkLock(p, slot) {
+            if(parseInt(p.dataset.id) === parseInt(slot.dataset.idx)) {
+                p.classList.add('locked', 'just-locked');
+                setTimeout(() => p.classList.remove('just-locked'), 500);
             }
         }
-        function openRewardModal() {
-            const data = levelsData[currentLevel];
-            document.getElementById('story-title').innerText = data.title;
-            document.getElementById('story-location').innerText = data.location;
-            document.getElementById('reward-img').src = currentImageUrl;
-            document.getElementById('story-desc').innerHTML = data.story;
-            document.getElementById('story-modal').classList.add('active');
-        }
-        function finishStoryAndNext() {
-            document.getElementById('story-modal').classList.remove('active');
-            if (currentLevel === maxUnlockedLevel) { maxUnlockedLevel++; localStorage.setItem('puzzleDZ_progress', maxUnlockedLevel); }
-            if (currentLevel + 1 < levelsData.length) { currentLevel++; loadLevel(currentLevel); }
-            else { alert("Félicitations ! Vous avez terminé le voyage !"); goToLevelSelect(); }
+        function checkWin() {
+            if (document.querySelectorAll('.puzzle-piece.locked').length === cols*rows) {
+                document.getElementById('btn-victory').style.display = 'block';
+            }
         }
 
-        function calcGrid(total, w, h) {
-            const ratio = w / h; let bestC=1, bestR=total, bestDiff=999;
-            for(let c=1; c<=total; c++) { if(total%c===0) { let r=total/c; let diff=Math.abs((c/r)-ratio); if(diff<bestDiff){bestDiff=diff;bestC=c;bestR=r;}}}
-            return {cols: bestC, rows: bestR};
+        // --- MODALES ---
+        function openRewardModal() {
+            const lvl = currentCategory.levels[currentLevelIdx];
+            document.getElementById('story-title').innerText = "MAGNIFIQUE !";
+            document.getElementById('reward-img').src = currentImageUrl;
+            document.getElementById('story-desc').innerHTML = lvl.story;
+            document.getElementById('story-modal').classList.add('active');
         }
-        function openRefModal() { document.getElementById('ref-image').src = currentImageUrl; document.getElementById('ref-modal').classList.add('active'); }
-        function closeRefModal(e) { if (e.target.classList.contains('modal-overlay')) document.getElementById('ref-modal').classList.remove('active'); }
+        
+        function finishStoryAndNext() {
+            document.getElementById('story-modal').classList.remove('active');
+            let saved = parseInt(localStorage.getItem(`pz_${currentCategory.id}`)) || 0;
+            if(currentLevelIdx === saved) localStorage.setItem(`pz_${currentCategory.id}`, saved+1);
+            if(currentLevelIdx + 1 < currentCategory.levels.length) launchLevel(currentLevelIdx + 1);
+            else backToLevels();
+        }
+
+        function openRefModal() {
+            document.getElementById('ref-image').src = currentImageUrl;
+            document.getElementById('ref-modal').classList.add('active');
+        }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     </script>
 </body>
 </html>
