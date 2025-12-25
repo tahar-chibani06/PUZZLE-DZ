@@ -3,223 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUZZLE DZ - V25 Scroll Fix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>PUZZLE DZ - V32 Briefing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --green: #00802b;
-            --green-dark: #005c2b;
             --red: #D60000;
             --dark: #1a1a1a;
-            --grey: #f0f2f5;
-            --text-grey: #666;
+            --grey-light: #f4f4f4;
+            --border-color: #e0e0e0;
         }
 
-        * { box-sizing: border-box; touch-action: pan-y; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Montserrat', sans-serif;
             margin: 0; padding: 0;
             height: 100vh; width: 100vw;
             overflow: hidden;
-            background: #fff;
+            background: #ffffff;
             color: var(--dark);
         }
 
-        /* --- UI GLOBALE --- */
+        /* --- STRUCTURE --- */
         .screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; /* IMPORTANT POUR LE SCROLL */
-            background: #fff;
-            z-index: 10; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+            background: #ffffff;
+            z-index: 10; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .screen.hidden { transform: translateY(100%); pointer-events: none; }
+        .screen.hidden { transform: translateY(100%) scale(0.95); opacity: 0; pointer-events: none; }
 
-        /* 1. ACCUEIL */
-        #home-screen { justify-content: center; align-items: center; z-index: 50; background: #fff;}
-        .logo-box { text-align: center; }
-        .logo { font-size: 3.5rem; font-weight: 900; color: var(--green); margin:0; line-height: 1;}
-        .sub-logo { font-weight: 600; color: #555; letter-spacing: 1px; margin-top: 5px;}
-        .btn-main {
-            margin-top: 40px; padding: 15px 60px; background: var(--green); color: white;
-            border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700;
-            box-shadow: 0 5px 20px rgba(0,128,43,0.3); cursor: pointer;
+        /* 1. ACCUEIL (ANIMÉ) */
+        #home-screen { 
+            justify-content: center; align-items: center; z-index: 50; 
+            position: relative; overflow: hidden; background: #000;
         }
-        .admin-btn { position: absolute; top: 20px; right: 20px; background: #eee; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.2rem; }
+        .bg-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .bg-slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; opacity: 0; transform: scale(1);
+            transition: opacity 1.5s ease-in-out, transform 6s linear;
+        }
+        .bg-slide.active { opacity: 0.6; transform: scale(1.1); } 
+        .home-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.95) 100%); }
+        .home-content { position: relative; z-index: 5; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .app-icon {
+            width: 100px; height: 100px; background: linear-gradient(135deg, var(--green), #005c2b);
+            border-radius: 20px; display: flex; justify-content: center; align-items: center;
+            font-size: 3rem; color: white; box-shadow: 0 15px 35px rgba(0,128,43,0.3);
+            margin-bottom: 10px; animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .logo-text { font-size: 3rem; font-weight: 900; color: var(--dark); line-height: 1; letter-spacing: -1px; margin: 0; }
+        .logo-sub { font-size: 0.8rem; font-weight: 700; color: var(--green); letter-spacing: 3px; text-transform: uppercase; }
+        .btn-start {
+            margin-top: 40px; padding: 18px 60px; background: var(--dark); color: white;
+            border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-start:active { transform: scale(0.95); }
+        .home-footer { position: absolute; bottom: 30px; width: 100%; text-align: center; z-index: 5; font-size: 0.7rem; color: #777; font-weight: 600; letter-spacing: 0.5px; }
+        .home-footer span { color: var(--dark); font-weight: 800; }
 
-        /* 2. BIBLIOTHÈQUE - STRUCTURE SCROLL */
-        #library-screen { 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .lib-header { flex-shrink: 0; padding: 10px; } /* Ne rétrécit pas */
-
-        /* PUB BANNER */
-        .promo-container { 
-            padding: 0 15px; margin-bottom: 15px; 
-            flex-shrink: 0; /* Ne rétrécit pas */
-        }
-        .promo-card {
-            width: 100%; height: 160px; border-radius: 0; overflow: hidden; position: relative;
-            background: #000; box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-        }
-        .promo-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
-        .promo-content { position: absolute; bottom: 20px; left: 20px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .promo-tag { font-size: 0.7rem; background: rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 5px; backdrop-filter: blur(5px); margin-bottom: 5px; display: inline-block; font-weight: 700;}
-        .promo-title { font-size: 1.4rem; font-weight: 800; line-height: 1.1; margin: 0; max-width: 80%; }
-
-        /* TABS (SCROLL HORIZONTAL CORRIGÉ) */
-        .tabs-container-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            padding: 0 15px 15px 15px;
-            flex-shrink: 0; /* Empêche le menu de disparaître */
-            -webkit-overflow-scrolling: touch;
-        }
-        .tabs-scroll {
-            display: flex;
-            gap: 10px;
-            width: max-content; /* Force la largeur au contenu */
-        }
-        
-        .tab-btn {
-            padding: 10px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 700;
-            background: #f4f4f4; color: var(--text-grey); border: none; cursor: pointer; 
-            transition: all 0.2s;
-            flex: 0 0 auto; /* EMPÊCHE L'ÉCRASEMENT DES BOUTONS */
-        }
-        .tab-btn.active { background: var(--dark); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .tab-btn.custom-tab { background: #fff0f0; color: var(--red); border: 1px solid var(--red); }
+        /* 2. BIBLIOTHÈQUE */
+        #library-screen { display: flex; flex-direction: column; height: 100%; }
+        .lib-header { padding: 15px; flex-shrink: 0; } 
+        .promo-container { padding: 0 15px; margin-bottom: 20px; flex-shrink: 0; }
+        .promo-card { width: 100%; height: 160px; border-radius: 0; overflow: hidden; position: relative; background: #000; }
+        .promo-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .promo-content { position: absolute; bottom: 20px; left: 20px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .promo-tag { font-size: 0.65rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px); margin-bottom: 6px; display: inline-block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        .promo-title { font-size: 1.5rem; font-weight: 800; line-height: 1.1; margin: 0; max-width: 80%; }
+        .tabs-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 15px 15px 15px; scrollbar-width: none; white-space: nowrap; flex-shrink: 0; -webkit-overflow-scrolling: touch; touch-action: pan-x; }
+        .tabs-scroll::-webkit-scrollbar { display: none; } 
+        .tab-btn { padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; background: var(--grey-light); color: #777; border: none; cursor: pointer; transition: all 0.2s; flex: 0 0 auto; }
+        .tab-btn.active { background: var(--dark); color: white; }
+        .tab-btn.custom-tab { background: #fff5f5; color: var(--red); }
         .tab-btn.custom-tab.active { background: var(--red); color: white; }
-
-        /* GRILLE (SCROLL VERTICAL CORRIGÉ) */
-        .library-content { 
-            flex: 1; /* Prend tout l'espace restant en bas */
-            overflow-y: auto; /* Active le scroll vertical */
-            padding: 0 15px 80px 15px;
-            min-height: 0; /* Fix flexbox important */
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .levels-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            padding-bottom: 50px;
-        }
-        
-        .lvl-card {
-            aspect-ratio: 1; border-radius: 12px; overflow: hidden; position: relative;
-            background: #eee; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .lvl-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background:#ccc;}
+        .library-content { flex: 1; overflow-y: auto; padding: 0 15px 80px 15px; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+        .levels-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 50px; }
+        .lvl-card { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; cursor: pointer; }
+        .lvl-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background:#f0f0f0;}
         .lvl-card:active img { transform: scale(0.98); }
-        .lvl-badge {
-            position: absolute; bottom: 8px; right: 8px; 
-            background: rgba(0,0,0,0.6); color: white; 
-            padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;
-            backdrop-filter: blur(2px);
-        }
-        .lvl-locked { position: absolute; inset: 0; background: rgba(255,255,255,0.6); display: flex; justify-content: center; align-items: center; }
-
-        /* CUSTOM UI */
-        .custom-area {
-            text-align: center; padding: 20px; background: #fff; border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 2px dashed #ccc;
-            grid-column: span 2; display: flex; flex-direction: column; gap: 15px;
-        }
-        .custom-icon { font-size: 3rem; margin-bottom: 10px; display: block;}
-        .btn-upload {
-            padding: 15px; background: var(--red); color: white; border: none; border-radius: 10px;
-            font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%;
-        }
-        .diff-selector { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
-        .diff-btn {
-            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; font-weight: 600; cursor: pointer;
-        }
+        .lvl-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.9); color: var(--dark); padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .lvl-locked { position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+        
+        .custom-area { text-align: center; padding: 30px 20px; background: #fff; border-radius: 12px; border: 2px dashed #ddd; grid-column: span 2; display: flex; flex-direction: column; gap: 15px; }
+        .btn-upload { padding: 15px; background: var(--red); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(214,0,0,0.2); }
+        .diff-selector { display: flex; gap: 8px; justify-content: center; margin-top: 5px; }
+        .diff-btn { flex: 1; padding: 8px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
         .diff-btn.selected { background: var(--dark); color: white; border-color: var(--dark); }
 
-        /* 3. JEU UI */
-        #game-screen { background: #e0e0e0; }
-        .game-header {
-            height: 70px; background: white; padding: 0 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex-shrink: 0;
-        }
-        .game-header-left { flex: 0 0 auto; }
-        .game-header-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 10px; }
-        .game-header-right { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; }
-
-        .game-title { font-size: 0.85rem; font-weight: 800; color: var(--dark); text-transform: uppercase; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; text-align: center; }
+        /* --- 3. BRIEFING SCREEN (NOUVEAU) --- */
+        #briefing-screen { background: #fff; display: flex; flex-direction: column; }
         
-        .score-pill {
-            background: #fff8e1; color: #f1c40f; 
-            padding: 4px 10px; border-radius: 15px;
-            font-size: 0.8rem; font-weight: 800;
-            border: 1px solid #fceabb;
-            display: flex; align-items: center; gap: 4px;
-            transition: transform 0.2s;
+        .briefing-img-container {
+            width: 100%; height: 45vh; /* 45% de la hauteur */
+            background: #f0f0f0; position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
-        .score-pill.pop { transform: scale(1.4); background: #ffd700; color: #fff; border-color: #fff; }
+        .briefing-img { width: 100%; height: 100%; object-fit: cover; } /* Image complète */
+        
+        .briefing-back {
+            position: absolute; top: 20px; left: 20px;
+            width: 40px; height: 40px; background: white; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; border: none;
+            font-weight: 800; font-size: 1.2rem;
+        }
 
-        .game-prog-container { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 140px; }
-        .gp-bar { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+        .briefing-content {
+            flex: 1; padding: 30px; 
+            display: flex; flex-direction: column;
+            overflow-y: auto; text-align: left;
+        }
+        .briefing-title {
+            font-size: 1.8rem; font-weight: 900; color: var(--dark);
+            margin: 0; line-height: 1.1; text-transform: uppercase;
+        }
+        .briefing-subtitle {
+            font-size: 0.9rem; font-weight: 700; color: var(--green);
+            margin: 10px 0 20px 0; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .briefing-desc {
+            font-size: 0.95rem; color: #555; line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .btn-play-game {
+            width: 100%; padding: 18px; 
+            background: var(--green); color: white;
+            border: none; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(0,128,43,0.3); cursor: pointer;
+            transition: transform 0.1s; margin-top: auto; /* Pousse en bas */
+        }
+        .btn-play-game:active { transform: scale(0.98); }
+
+
+        /* 4. JEU UI */
+        #game-screen { background: #fff; display: flex; flex-direction: column; }
+        .game-header { height: 60px; background: white; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; z-index: 20; }
+        .gh-left { width: 40px; }
+        .gh-center { flex: 1; display: flex; justify-content: center; }
+        .gh-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; width: 60px; }
+        .game-prog-container { display: flex; flex-direction: column; align-items: center; width: 120px; gap: 2px; }
+        .gp-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
         .gp-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
-        .gp-text { font-size: 0.7rem; font-weight: 700; color: #999; width: 30px; text-align: right; }
+        .gp-text { font-size: 0.65rem; font-weight: 700; color: #bbb; letter-spacing: 1px; }
+        .score-pill { background: #fff; color: #f39c12; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; border: 1px solid #f0f0f0; display: flex; align-items: center; gap: 5px; }
+        .score-pill.pop { transform: scale(1.2); background: #fff8e1; border-color: #f39c12; }
+        
+        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative; }
+        .game-ad-banner { flex-shrink: 0; width: 92%; max-width: 400px; height: 55px; margin: 0 auto 20px auto; background: #fafafa; border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 10px; border-radius: 0; }
+        .ad-logo { width: 35px; height: 35px; background: #eee; margin-right: 12px; background-image: url('https://picsum.photos/seed/ad/100'); background-size: cover; flex-shrink: 0; }
+        .ad-content { display: flex; flex-direction: column; justify-content: center; }
+        .ad-line-1 { font-weight: 700; font-size: 0.8rem; color: var(--dark); line-height: 1.2; }
+        .ad-line-2 { font-size: 0.65rem; color: #888; margin-top: 1px; }
 
-        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden;}
-        .board { 
-            background: white; border: 3px solid white; border-radius: 4px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; 
-            display: grid; gap: 0; touch-action: none;
-        }
-        .slot { width: 100%; height: 100%; position: relative; background: rgba(0,0,0,0.05); }
-        .piece { 
-            width: 100%; height: 100%; position: absolute; top:0; left:0; 
-            background-repeat: no-repeat; cursor: grab; z-index: 1;
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 2px;
-            transition: transform 0.1s; background-color: #ccc;
-        }
-        .piece.dragging { z-index: 1000; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-color:transparent; }
-        .piece.locked { z-index: 0; pointer-events: none; filter: brightness(1.05); }
-        
-        .merged-top { border-top-color: transparent !important; }
-        .merged-right { border-right-color: transparent !important; }
-        .merged-bottom { border-bottom-color: transparent !important; }
-        .merged-left { border-left-color: transparent !important; }
-        
-        @keyframes flash { 0% { filter: brightness(2); } 100% { filter: brightness(1.05); } }
-        .just-locked { animation: flash 0.5s; }
+        .board { background: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; display: grid; gap: 0; touch-action: none; }
+        .slot { width: 100%; height: 100%; position: relative; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05); }
+        .piece { width: 100%; height: 100%; position: absolute; top:0; left:0; background-repeat: no-repeat; cursor: grab; z-index: 1; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.1); border-radius: 1px; transition: transform 0.1s; background-color: #eee; touch-action: none; }
+        .piece.dragging { z-index: 1000; transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .piece.locked { z-index: 0; pointer-events: none; box-shadow: none; filter: brightness(1.02); }
+        .merged-top { border-top: none; } .merged-right { border-right: none; } .merged-bottom { border-bottom: none; } .merged-left { border-left: none; }
+        @keyframes flash { 0% { filter: brightness(1.5); } 100% { filter: brightness(1.02); } }
+        .just-locked { animation: flash 0.4s; }
 
         /* MODALES */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 200;
-            display: none; justify-content: center; align-items: center; flex-direction: column; padding: 30px; text-align: center;
-        }
+        .modal { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 200; display: none; justify-content: center; align-items: center; flex-direction: column; padding: 40px; text-align: center; }
         .modal.active { display: flex; }
-        .modal img { width: 100%; max-height: 40vh; object-fit: contain; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .modal img { width: 100%; max-height: 35vh; object-fit: contain; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #login-modal { background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 400; color: white;}
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 85%; max-width: 320px; color: var(--dark); text-align: center; }
+        .login-title { font-weight: 800; margin-bottom: 20px; font-size: 1.1rem; }
         
-        /* ADMIN PANEL */
-        #admin-panel {
-            position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
-            background: #fff; z-index: 300; transition: right 0.3s ease;
-            display: flex; flex-direction: column; padding: 20px; overflow-y: auto;
-        }
+        #admin-panel { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: #fff; z-index: 300; transition: right 0.3s ease; display: flex; flex-direction: column; padding: 25px; overflow-y: auto; }
         #admin-panel.open { right: 0; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px;}
-        .admin-title { font-size: 1.2rem; font-weight: 800; color: var(--dark); }
-        .close-admin { background: none; border: none; font-size: 2rem; cursor: pointer; color: #555; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0;}
+        .admin-title { font-size: 1.1rem; font-weight: 800; }
+        .close-admin { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
         .form-group { margin-bottom: 20px; text-align: left; }
-        .form-label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-size: 0.9rem;}
-        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-family: inherit; font-size: 1rem; }
-        .btn-save { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; margin-top: 10px; cursor: pointer; }
-        .preview-box { width: 100%; height: 120px; background: #eee; border-radius: 10px; margin-top: 10px; overflow: hidden; position: relative; }
+        .form-label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-size: 0.8rem; text-transform: uppercase;}
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95rem; }
+        .btn-save { width: 100%; padding: 15px; background: var(--dark); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; margin-top: 10px; cursor: pointer; }
+        .preview-box { width: 100%; height: 120px; background: #f9f9f9; border-radius: 8px; margin-top: 10px; overflow: hidden; position: relative; border: 1px solid #eee;}
         .preview-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .btn-icon { background: white; border: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; display:flex; justify-content:center; align-items:center; font-size:1.2rem;}
-        .btn-modal { padding: 12px 40px; background: var(--green); color: white; border: none; border-radius: 30px; font-weight: 700; cursor: pointer; }
+        .btn-icon { background: white; border: 1px solid #f0f0f0; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display:flex; justify-content:center; align-items:center; font-size:1rem; color:#333;}
+        .btn-modal { padding: 14px 40px; background: var(--green); color: white; border: none; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,128,43,0.2);}
         .confetti { position: absolute; width: 8px; height: 8px; animation: fall 3s linear forwards; }
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
     </style>
@@ -229,83 +204,87 @@
     <div id="confetti-container" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></div>
 
     <div id="home-screen" class="screen">
-        <button class="admin-btn" onclick="openAdmin()">⚙️</button>
-        <div class="logo-box">
-            <h1 class="logo">PUZZLE DZ</h1>
-            <div class="sub-logo">AUTHENTIC ALGERIA</div>
-            <button class="btn-main" onclick="startApp()">COMMENCER</button>
+        <div class="bg-slider">
+            <div class="bg-slide active" style="background-image: url('https://picsum.photos/seed/sahara1/1000/1500');"></div>
+            <div class="bg-slide" style="background-image: url('https://picsum.photos/seed/alger1/1000/1500');"></div>
+            <div class="bg-slide" style="background-image: url('https://picsum.photos/seed/tassili1/1000/1500');"></div>
+        </div>
+        <div class="home-overlay"></div>
+        <div class="home-content">
+            <div class="logo-box" id="secret-logo">
+                <div class="app-icon">🧩</div>
+                <h1 class="logo-text">PUZZLE DZ</h1>
+                <div class="logo-sub">AUTHENTIC ALGERIA</div>
+            </div>
+            <button class="btn-start" onclick="startApp()">COMMENCER</button>
+        </div>
+        <div class="home-footer">CREATED BY : <span>ASSSIREM MEDIA</span></div>
+    </div>
+
+    <div id="login-modal" class="modal">
+        <div class="login-box">
+            <div class="login-title">🔒 Espace Admin</div>
+            <input type="password" id="admin-pass" class="form-input" placeholder="Code secret" style="margin-bottom:15px; text-align:center;">
+            <button class="btn-save" onclick="checkPassword()">ENTRER</button>
+            <button onclick="closeLogin()" style="background:none; border:none; color:#999; margin-top:15px; font-size:0.8rem; text-decoration:underline;">Annuler</button>
         </div>
     </div>
 
     <div id="admin-panel">
         <div class="admin-header">
-            <div class="admin-title">Gestion Publicité</div>
-            <button class="close-admin" onclick="closeAdmin()">×</button>
+            <div class="admin-title">Configuration</div>
+            <button class="close-admin" onclick="closeAdmin()">✕</button>
         </div>
-        <div class="form-group">
-            <label class="form-label">Titre de la Promo</label>
-            <input type="text" id="admin-title" class="form-input" value="Merveilles du Sahara">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Tag / Badge</label>
-            <input type="text" id="admin-tag" class="form-input" value="Puzzle sélectionné">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Image de la bannière</label>
-            <input type="file" id="admin-file" class="form-input" accept="image/*" onchange="handleFileSelect(event)">
-            <div class="preview-box">
-                <img id="admin-preview" class="preview-img" src="https://picsum.photos/seed/sahara/600/300">
-            </div>
-        </div>
-        <button class="btn-save" onclick="saveAdminData()">ENREGISTRER</button>
-        <button onclick="hardReset()" style="width:100%; margin-top:20px; background:#e74c3c; color:white; border:none; padding:10px; border-radius:10px; font-weight:700;">RÉPARER L'APPLICATION</button>
+        <div class="form-group"><label class="form-label">Titre Promo</label><input type="text" id="admin-title" class="form-input" value="Merveilles du Sahara"></div>
+        <div class="form-group"><label class="form-label">Badge Promo</label><input type="text" id="admin-tag" class="form-input" value="Puzzle sélectionné"></div>
+        <div class="form-group"><label class="form-label">Image Bannière</label><input type="file" id="admin-file" class="form-input" accept="image/*" onchange="handleFileSelect(event)"><div class="preview-box"><img id="admin-preview" class="preview-img" src="https://picsum.photos/seed/sahara/600/300"></div></div>
+        <div style="border-top:1px solid #f0f0f0; margin:25px 0;"></div>
+        <div class="form-group"><label class="form-label">Pub In-Game L1</label><input type="text" id="admin-game-l1" class="form-input" value="Découvrez l'Algérie"></div>
+        <div class="form-group"><label class="form-label">Pub In-Game L2</label><input type="text" id="admin-game-l2" class="form-input" value="Visitez nos partenaires"></div>
+        <button class="btn-save" onclick="saveAdminData()">SAUVEGARDER</button>
+        <button onclick="hardReset()" style="width:100%; margin-top:20px; background:white; color:#e74c3c; border:1px solid #e74c3c; padding:12px; border-radius:8px; font-weight:700; font-size:0.8rem;">RÉPARER L'APPLICATION</button>
     </div>
 
     <div id="library-screen" class="screen hidden">
         <div class="lib-header"></div> 
-
         <div class="promo-container">
             <div class="promo-card">
                 <img id="promo-img" src="" class="promo-img">
-                <div class="promo-content">
-                    <div id="promo-tag" class="promo-tag"></div>
-                    <div id="promo-title" class="promo-title"></div>
-                </div>
+                <div class="promo-content"><div id="promo-tag" class="promo-tag"></div><div id="promo-title" class="promo-title"></div></div>
             </div>
         </div>
+        <div class="tabs-scroll" id="tabs-container"></div>
+        <div class="library-content"><div class="levels-grid" id="levels-grid"></div></div>
+    </div>
 
-        <div class="tabs-container-wrapper">
-            <div class="tabs-scroll" id="tabs-container"></div>
+    <div id="briefing-screen" class="screen hidden">
+        <div class="briefing-img-container">
+            <button class="briefing-back" onclick="backToLibrary()">❮</button>
+            <img id="briefing-img" class="briefing-img" src="">
         </div>
-
-        <div class="library-content">
-            <div class="levels-grid" id="levels-grid"></div>
+        <div class="briefing-content">
+            <h1 id="briefing-title" class="briefing-title">TITRE</h1>
+            <h3 id="briefing-subtitle" class="briefing-subtitle">SOUS-TITRE</h3>
+            <p id="briefing-desc" class="briefing-desc">Description</p>
+            <button class="btn-play-game" onclick="startGame()">COMMENCER LE PUZZLE</button>
         </div>
     </div>
 
     <div id="game-screen" class="screen hidden">
         <div class="game-header">
-            <div class="game-header-left">
-                <button class="btn-icon" onclick="backToLibrary()">❮</button>
-            </div>
-            
-            <div class="game-header-center">
-                <div class="game-title" id="game-title">TITRE</div>
+            <div class="gh-left"><button class="btn-icon" onclick="backToLibrary()">❮</button></div>
+            <div class="gh-center">
                 <div class="game-prog-container">
                     <div class="gp-text" id="gp-text">0/24</div>
                     <div class="gp-bar"><div id="gp-fill" class="gp-fill"></div></div>
                 </div>
             </div>
-
-            <div class="game-header-right">
-                <div class="score-pill" id="score-container">
-                    💎 <span id="score-display">0</span>
-                </div>
-                <button class="btn-icon" onclick="toggleRef()">👁️</button>
-            </div>
+            <div class="gh-right"><div class="score-pill" id="score-container">💎 <span id="score-display">0</span></div></div>
         </div>
-        <div class="game-area" id="game-area">
-            <div id="board" class="board"></div>
+        <div class="game-area" id="game-area"><div id="board" class="board"></div></div>
+        <div class="game-ad-banner">
+            <div class="ad-logo"></div>
+            <div class="ad-content"><div class="ad-line-1" id="game-ad-l1"></div><div class="ad-line-2" id="game-ad-l2"></div></div>
         </div>
     </div>
 
@@ -313,19 +292,16 @@
         <h2 style="color:var(--green); margin-bottom:10px;">MAGNIFIQUE !</h2>
         <h3 style="color:#f1c40f; margin:0 0 15px 0;">+15 Points 💎</h3>
         <img id="win-img" src="">
-        <div id="win-txt" style="color:#555; margin-bottom:20px; font-size:0.9rem;"></div>
         <button class="btn-modal" onclick="nextLvl()">CONTINUER</button>
-    </div>
-
-    <div id="ref-modal" class="modal" onclick="this.classList.remove('active')">
-        <img id="ref-img" src="">
-        <p style="color:#fff; background:rgba(0,0,0,0.5); padding:5px 10px; border-radius:20px;">Fermer</p>
     </div>
 
     <input type="file" id="custom-file-input" accept="image/*" style="display:none;" onchange="processCustomImage(event)">
 
     <script>
         // --- DONNÉES ---
+        // Texte riche pour la présentation (simulé)
+        const SAMPLE_DESC = "Ce paysage emblématique représente la richesse culturelle et naturelle de l'Algérie. Découvrez chaque détail en assemblant les pièces de ce puzzle unique.";
+        
         const cats = [
             { id: 'custom', t: "📸 Créez le vôtre" },
             { id: 'nature', t: "Nature", img: "https://picsum.photos/seed/nature/200" },
@@ -350,8 +326,9 @@
                 let p = 24; if(i >= 10) p = 32; if(i >= 30) p = 40; 
                 lvls.push({
                     p: p, t: `${c.t} ${i+1}`,
-                    img: `https://picsum.photos/seed/${c.id}${i}/600/600`, 
-                    txt: "Un aperçu magnifique de l'Algérie."
+                    sub: `Niveau ${i+1} - ${p} Pièces`,
+                    desc: SAMPLE_DESC,
+                    img: `https://picsum.photos/seed/${c.id}${i}/600/600`
                 });
             }
             gameDB[c.id] = lvls;
@@ -363,87 +340,77 @@
         let gCols = 0, gRows = 0; 
         let customImageSrc = "";
         let customPieces = 24;
+        let pressTimer;
 
-        let promoData = { title: "Merveilles du Sahara", tag: "Puzzle sélectionné", img: "https://picsum.photos/seed/sahara/600/300" };
+        let promoData = { 
+            title: "Merveilles du Sahara", tag: "Puzzle sélectionné", 
+            img: "https://picsum.photos/seed/sahara/600/300",
+            gameL1: "Découvrez l'Algérie", gameL2: "Visitez nos partenaires"
+        };
 
         window.onload = function() {
             try {
-                loadUserData();
-                loadAdminData();
-                updatePromoUI();
-                renderTabs();
-                renderGrid();
-            } catch(e) {
-                console.error("Erreur, reset...", e);
-                hardReset();
-            }
+                loadUserData(); loadAdminData(); updatePromoUI();
+                renderTabs(); renderGrid(); setupSecretAdmin(); startSlideshow();
+            } catch(e) { hardReset(); }
         };
 
         function startApp() { nav('library-screen'); }
 
-        // --- SCORE & DATA ---
-        function loadUserData() {
-            const savedScore = localStorage.getItem('pz_score');
-            userScore = savedScore ? parseInt(savedScore) : 0;
-            if(isNaN(userScore)) userScore = 0;
-            updateScoreUI();
-        }
-        function addPoints(pts) {
-            userScore += pts;
-            localStorage.setItem('pz_score', userScore);
-            updateScoreUI();
-            const b = document.getElementById('score-container');
-            b.classList.add('pop');
-            setTimeout(() => b.classList.remove('pop'), 300);
-        }
-        function updateScoreUI() { document.getElementById('score-display').innerText = userScore; }
-        function hardReset() { localStorage.clear(); location.reload(); }
-
-        // --- ADMIN ---
-        function openAdmin() { document.getElementById('admin-panel').classList.add('open'); }
-        function closeAdmin() { document.getElementById('admin-panel').classList.remove('open'); }
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => document.getElementById('admin-preview').src = e.target.result;
-                reader.readAsDataURL(file);
-            }
-        }
-        function saveAdminData() {
-            promoData = {
-                title: document.getElementById('admin-title').value || "Titre",
-                tag: document.getElementById('admin-tag').value || "Tag",
-                img: document.getElementById('admin-preview').src
-            };
-            localStorage.setItem('pz_promo_data', JSON.stringify(promoData));
-            updatePromoUI();
-            closeAdmin();
-        }
-        function loadAdminData() {
-            const saved = localStorage.getItem('pz_promo_data');
-            if(saved) {
-                try { promoData = JSON.parse(saved); } catch(e) {}
-                document.getElementById('admin-title').value = promoData.title;
-                document.getElementById('admin-tag').value = promoData.tag;
-                document.getElementById('admin-preview').src = promoData.img;
-            }
-        }
-        function updatePromoUI() {
-            if(document.getElementById('promo-title')) {
-                document.getElementById('promo-title').innerText = promoData.title;
-                document.getElementById('promo-tag').innerText = promoData.tag;
-                document.getElementById('promo-img').src = promoData.img;
-            }
+        // --- SLIDESHOW ---
+        function startSlideshow() {
+            const slides = document.querySelectorAll('.bg-slide');
+            let index = 0;
+            setInterval(() => {
+                slides[index].classList.remove('active');
+                index = (index + 1) % slides.length;
+                slides[index].classList.add('active');
+            }, 6000);
         }
 
-        // --- NAV ---
+        // --- NAVIGATION ---
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
             const el = document.getElementById(id);
             if(el) el.classList.remove('hidden');
         }
 
+        // --- BRIEFING LOGIC (NOUVEAU) ---
+        function showBriefing(isCustom) {
+            let img, t, sub, desc;
+            
+            if(isCustom) {
+                img = customImageSrc;
+                t = "VOTRE PHOTO";
+                sub = `PUZZLE PERSONNALISÉ - ${customPieces} PIÈCES`;
+                desc = "Vous avez importé cette image depuis votre galerie. Reconstituez vos propres souvenirs !";
+            } else {
+                const lvl = gameDB[activeCat][currIdx];
+                img = lvl.img;
+                t = lvl.t;
+                sub = lvl.sub;
+                desc = lvl.desc;
+            }
+
+            document.getElementById('briefing-img').src = img;
+            document.getElementById('briefing-title').innerText = t;
+            document.getElementById('briefing-subtitle').innerText = sub;
+            document.getElementById('briefing-desc').innerText = desc;
+            
+            nav('briefing-screen');
+        }
+
+        function startGame() {
+            // C'est ici qu'on lance vraiment le jeu
+            if(activeCat === 'custom') {
+                launchCustomBoard();
+            } else {
+                launchStandardBoard();
+            }
+            nav('game-screen');
+        }
+
+        // --- LIBRARY LOGIC ---
         function renderTabs() {
             const container = document.getElementById('tabs-container');
             if(!container) return;
@@ -458,18 +425,13 @@
             });
         }
 
-        function selectTab(id) {
-            activeCat = id;
-            renderTabs();
-            renderGrid();
-        }
+        function selectTab(id) { activeCat = id; renderTabs(); renderGrid(); }
 
         function renderGrid() {
             const container = document.getElementById('levels-grid');
             if(!container) return;
             container.innerHTML = '';
 
-            // CAS SPÉCIAL : CUSTOM
             if(activeCat === 'custom') {
                 container.innerHTML = `
                     <div class="custom-area">
@@ -492,13 +454,15 @@
             levels.forEach((l, i) => {
                 const card = document.createElement('div');
                 card.className = 'lvl-card';
-                card.innerHTML = `
-                    <img src="${l.img}" loading="lazy">
-                    ${i > max ? '<div class="lvl-locked">🔒</div>' : `<div class="lvl-badge">Niv ${i+1}</div>`}
-                `;
-                if(i <= max) card.onclick = () => launchGame(i);
+                card.innerHTML = `<img src="${l.img}" loading="lazy">${i > max ? '<div class="lvl-locked">🔒</div>' : `<div class="lvl-badge">Niv ${i+1}</div>`}`;
+                if(i <= max) card.onclick = () => preLaunch(i);
                 container.appendChild(card);
             });
+        }
+
+        function preLaunch(i) {
+            currIdx = i;
+            showBriefing(false);
         }
 
         // --- CUSTOM LOGIC ---
@@ -510,49 +474,36 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     customImageSrc = e.target.result;
-                    launchCustomGame();
+                    showBriefing(true); // Aller au briefing avec l'image custom
                 };
                 reader.readAsDataURL(file);
             }
         }
-        function launchCustomGame() {
-            const customLvl = {
-                p: customPieces, t: "Mon Puzzle", img: customImageSrc, txt: "Bravo ! Puzzle personnalisé terminé."
-            };
+
+        function launchCustomBoard() {
+            const customLvl = { p: customPieces, img: customImageSrc };
             document.getElementById('gp-fill').style.width = '0%';
             document.getElementById('gp-text').innerText = `0/${customLvl.p}`;
-            document.getElementById('game-title').innerText = "MON PUZZLE";
             buildBoard(customLvl);
-            nav('game-screen');
         }
 
-        function backToLibrary() {
-            nav('library-screen');
-            renderGrid();
-        }
-
-        // --- JEU ---
-        function launchGame(idx) {
-            currIdx = idx;
-            const lvl = gameDB[activeCat][idx];
+        function launchStandardBoard() {
+            const lvl = gameDB[activeCat][currIdx];
             document.getElementById('gp-fill').style.width = '0%';
             document.getElementById('gp-text').innerText = `0/${lvl.p}`;
-            document.getElementById('game-title').innerText = lvl.t;
             buildBoard(lvl);
-            nav('game-screen');
         }
 
+        function backToLibrary() { nav('library-screen'); renderGrid(); }
+
+        // --- GAME ENGINE ---
         function buildBoard(lvl) {
             const board = document.getElementById('board');
             board.innerHTML = '';
-
-            let w = window.innerWidth - 30; 
-            let h = window.innerHeight - 100;
+            let w = window.innerWidth - 30; let h = window.innerHeight - 180;
             if(w < 300) w = 300; if(h < 400) h = 400;
-
             let dims = calculateGrid(lvl.p, w, h);
             gCols = dims.c; gRows = dims.r;
-            
             let size = Math.floor(Math.min(w/gCols, h/gRows));
             
             board.style.width = (size * gCols) + 'px';
@@ -564,23 +515,16 @@
             
             for(let i=0; i<lvl.p; i++) {
                 let slot = document.createElement('div');
-                slot.className = 'slot';
-                slot.dataset.idx = i;
-                
+                slot.className = 'slot'; slot.dataset.idx = i;
                 let pid = ids[i];
                 let p = document.createElement('div');
-                p.className = 'piece';
-                p.dataset.id = pid;
-                
+                p.className = 'piece'; p.dataset.id = pid;
                 let cx = pid % gCols; let cy = Math.floor(pid / gCols);
                 p.style.backgroundImage = `url(${lvl.img})`;
                 p.style.backgroundSize = `${size * gCols}px ${size * gRows}px`;
                 p.style.backgroundPosition = `-${cx * size}px -${cy * size}px`;
-                
                 p.onpointerdown = dragStart;
-                slot.appendChild(p);
-                board.appendChild(slot);
-                
+                slot.appendChild(p); board.appendChild(slot);
                 if(pid === i) lock(p);
             }
             checkFusions();
@@ -600,19 +544,15 @@
             return {c:bestC, r:bestR};
         }
 
-        // --- MOTEUR PHYSIQUE ---
         function dragStart(e) {
             e.preventDefault();
             let p = e.target;
             if(p.classList.contains('locked')) return;
-            dragged = p;
-            originSlot = p.parentNode;
+            dragged = p; originSlot = p.parentNode;
             p.setPointerCapture(e.pointerId);
             startX = e.clientX; startY = e.clientY;
-            p.classList.add('dragging');
-            p.style.zIndex = 1000;
-            p.onpointermove = dragMove;
-            p.onpointerup = dragEnd;
+            p.classList.add('dragging'); p.style.zIndex = 1000;
+            p.onpointermove = dragMove; p.onpointerup = dragEnd;
         }
 
         function dragMove(e) {
@@ -625,13 +565,10 @@
             let p = dragged;
             p.onpointermove = null; p.onpointerup = null;
             p.releasePointerCapture(e.pointerId);
-            p.classList.remove('dragging');
-            p.style.transform = 'none'; p.style.zIndex = '';
-
+            p.classList.remove('dragging'); p.style.transform = 'none'; p.style.zIndex = '';
             p.style.visibility = 'hidden';
             let el = document.elementFromPoint(e.clientX, e.clientY);
             p.style.visibility = 'visible';
-            
             let targetSlot = el ? el.closest('.slot') : null;
             
             if(targetSlot && targetSlot !== originSlot) {
@@ -647,25 +584,14 @@
                     let total = (activeCat === 'custom') ? customPieces : gameDB[activeCat][currIdx].p;
                     document.getElementById('gp-text').innerText = `${lockedCount}/${total}`;
                     document.getElementById('gp-fill').style.width = (lockedCount/total)*100 + '%';
-
-                    if(lockedCount === total) {
-                        confetti();
-                        setTimeout(showWin, 1000);
-                    }
+                    if(lockedCount === total) { confetti(); setTimeout(showWin, 1000); }
                 }
             }
             dragged = null;
         }
 
         function check(p, slot) { if(parseInt(p.dataset.id) === parseInt(slot.dataset.idx)) lock(p); }
-
-        function lock(p) {
-            if(!p.classList.contains('locked')) {
-                p.classList.add('locked', 'just-locked');
-                setTimeout(()=>p.classList.remove('just-locked'), 500);
-            }
-            p.onpointerdown = null;
-        }
+        function lock(p) { if(!p.classList.contains('locked')) { p.classList.add('locked', 'just-locked'); setTimeout(()=>p.classList.remove('just-locked'), 500); } p.onpointerdown = null; }
 
         function checkFusions() {
             document.querySelectorAll('.piece').forEach(p => p.classList.remove('merged-top','merged-right','merged-bottom','merged-left'));
@@ -674,33 +600,19 @@
                 let p = slots[i].children[0];
                 if(!p) continue;
                 let id = parseInt(p.dataset.id);
-                
                 if(gCols === 0) return;
-
-                let r = Math.floor(i/gCols);
-                let c = i%gCols;
-                
-                if(c < gCols-1) {
-                    let nextP = slots[i+1].children[0];
-                    if(nextP && parseInt(nextP.dataset.id) === id+1) { p.classList.add('merged-right'); nextP.classList.add('merged-left'); }
-                }
-                if(r < gRows-1) {
-                    let botP = slots[i+gCols].children[0];
-                    if(botP && parseInt(botP.dataset.id) === id+gCols) { p.classList.add('merged-bottom'); botP.classList.add('merged-top'); }
-                }
+                let r = Math.floor(i/gCols); let c = i%gCols;
+                if(c < gCols-1) { let nextP = slots[i+1].children[0]; if(nextP && parseInt(nextP.dataset.id) === id+1) { p.classList.add('merged-right'); nextP.classList.add('merged-left'); } }
+                if(r < gRows-1) { let botP = slots[i+gCols].children[0]; if(botP && parseInt(botP.dataset.id) === id+gCols) { p.classList.add('merged-bottom'); botP.classList.add('merged-top'); } }
             }
         }
 
         function confetti() {
-            let c = document.getElementById('confetti-container');
-            c.style.display='block';
+            let c = document.getElementById('confetti-container'); c.style.display='block';
             for(let i=0; i<50; i++){
-                let d = document.createElement('div');
-                d.className = 'confetti';
-                d.style.left = Math.random()*100+'vw';
-                d.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-                d.style.animationDuration = (Math.random()*2+2)+'s';
-                c.appendChild(d);
+                let d = document.createElement('div'); d.className = 'confetti';
+                d.style.left = Math.random()*100+'vw'; d.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
+                d.style.animationDuration = (Math.random()*2+2)+'s'; c.appendChild(d);
             }
             setTimeout(()=>{c.innerHTML=''; c.style.display='none';}, 4000);
         }
@@ -708,19 +620,14 @@
         function showWin() {
             if(activeCat === 'custom') {
                 document.getElementById('win-img').src = customImageSrc;
-                document.getElementById('win-txt').innerHTML = "Bravo ! Puzzle personnalisé terminé.";
                 document.getElementById('win-modal').classList.add('active');
                 addPoints(15);
                 return;
             }
-
             let lvl = gameDB[activeCat][currIdx];
             document.getElementById('win-img').src = lvl.img;
-            document.getElementById('win-txt').innerHTML = lvl.txt;
             document.getElementById('win-modal').classList.add('active');
-            
             addPoints(15);
-
             let max = parseInt(localStorage.getItem('pz_'+activeCat)) || 0;
             if(currIdx === max) localStorage.setItem('pz_'+activeCat, max+1);
         }
@@ -728,16 +635,66 @@
         function nextLvl() {
             document.getElementById('win-modal').classList.remove('active');
             if(activeCat === 'custom') { backToLibrary(); return; }
-            if(currIdx < 49) launchGame(currIdx + 1);
+            if(currIdx < 49) { currIdx++; showBriefing(false); } // Aller au briefing suivant
             else backToLibrary();
         }
 
-        function toggleRef() {
-            let m = document.getElementById('ref-modal');
-            if(m.classList.contains('active')) m.classList.remove('active');
-            else {
-                document.getElementById('ref-img').src = (activeCat === 'custom') ? customImageSrc : gameDB[activeCat][currIdx].img;
-                m.classList.add('active');
+        // --- ADMIN & DATA ---
+        function setupSecretAdmin() {
+            const logo = document.getElementById('secret-logo');
+            logo.addEventListener('mousedown', () => { pressTimer = setTimeout(showLogin, 2000); });
+            logo.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            logo.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+            logo.addEventListener('touchstart', () => { pressTimer = setTimeout(showLogin, 2000); });
+            logo.addEventListener('touchend', () => clearTimeout(pressTimer));
+        }
+        function showLogin() { document.getElementById('login-modal').classList.add('active'); document.getElementById('admin-pass').value = ''; }
+        function closeLogin() { document.getElementById('login-modal').classList.remove('active'); }
+        function checkPassword() { if(document.getElementById('admin-pass').value === "1234") { closeLogin(); openAdmin(); } else alert("Mot de passe incorrect"); }
+        function loadUserData() {
+            const savedScore = localStorage.getItem('pz_score');
+            userScore = savedScore ? parseInt(savedScore) : 0; if(isNaN(userScore)) userScore = 0; updateScoreUI();
+        }
+        function addPoints(pts) {
+            userScore += pts; localStorage.setItem('pz_score', userScore); updateScoreUI();
+            const b = document.getElementById('score-container'); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 300);
+        }
+        function updateScoreUI() { document.getElementById('score-display').innerText = userScore; }
+        function hardReset() { localStorage.clear(); location.reload(); }
+        function openAdmin() { document.getElementById('admin-panel').classList.add('open'); }
+        function closeAdmin() { document.getElementById('admin-panel').classList.remove('open'); }
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('admin-preview').src = e.target.result; reader.readAsDataURL(file); }
+        }
+        function saveAdminData() {
+            promoData = {
+                title: document.getElementById('admin-title').value || "Titre",
+                tag: document.getElementById('admin-tag').value || "Tag",
+                img: document.getElementById('admin-preview').src,
+                gameL1: document.getElementById('admin-game-l1').value,
+                gameL2: document.getElementById('admin-game-l2').value
+            };
+            localStorage.setItem('pz_promo_data', JSON.stringify(promoData)); updatePromoUI(); closeAdmin();
+        }
+        function loadAdminData() {
+            const saved = localStorage.getItem('pz_promo_data');
+            if(saved) {
+                try { const parsed = JSON.parse(saved); promoData = { ...promoData, ...parsed }; } catch(e) {}
+                document.getElementById('admin-title').value = promoData.title;
+                document.getElementById('admin-tag').value = promoData.tag;
+                document.getElementById('admin-preview').src = promoData.img;
+                if(document.getElementById('admin-game-l1')) document.getElementById('admin-game-l1').value = promoData.gameL1;
+                if(document.getElementById('admin-game-l2')) document.getElementById('admin-game-l2').value = promoData.gameL2;
+            }
+        }
+        function updatePromoUI() {
+            if(document.getElementById('promo-title')) {
+                document.getElementById('promo-title').innerText = promoData.title;
+                document.getElementById('promo-tag').innerText = promoData.tag;
+                document.getElementById('promo-img').src = promoData.img;
+                document.getElementById('game-ad-l1').innerText = promoData.gameL1;
+                document.getElementById('game-ad-l2').innerText = promoData.gameL2;
             }
         }
     </script>
