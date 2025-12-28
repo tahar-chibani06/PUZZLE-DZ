@@ -3,698 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PUZZLE DZ - V32 Briefing</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <title>PUZZLE DZ - V85 ADMIN BUILDER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --green: #00802b;
-            --red: #D60000;
-            --dark: #1a1a1a;
-            --grey-light: #f4f4f4;
-            --border-color: #e0e0e0;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0; padding: 0;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
-            background: #ffffff;
-            color: var(--dark);
-        }
-
-        /* --- STRUCTURE --- */
-        .screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            background: #ffffff;
-            z-index: 10; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .screen.hidden { transform: translateY(100%) scale(0.95); opacity: 0; pointer-events: none; }
-
-        /* 1. ACCUEIL (ANIMÉ) */
-        #home-screen { 
-            justify-content: center; align-items: center; z-index: 50; 
-            position: relative; overflow: hidden; background: #000;
-        }
-        .bg-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        .bg-slide {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center; opacity: 0; transform: scale(1);
-            transition: opacity 1.5s ease-in-out, transform 6s linear;
-        }
-        .bg-slide.active { opacity: 0.6; transform: scale(1.1); } 
-        .home-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.95) 100%); }
-        .home-content { position: relative; z-index: 5; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .app-icon {
-            width: 100px; height: 100px; background: linear-gradient(135deg, var(--green), #005c2b);
-            border-radius: 20px; display: flex; justify-content: center; align-items: center;
-            font-size: 3rem; color: white; box-shadow: 0 15px 35px rgba(0,128,43,0.3);
-            margin-bottom: 10px; animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .logo-text { font-size: 3rem; font-weight: 900; color: var(--dark); line-height: 1; letter-spacing: -1px; margin: 0; }
-        .logo-sub { font-size: 0.8rem; font-weight: 700; color: var(--green); letter-spacing: 3px; text-transform: uppercase; }
-        .btn-start {
-            margin-top: 40px; padding: 18px 60px; background: var(--dark); color: white;
-            border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s;
-        }
-        .btn-start:active { transform: scale(0.95); }
-        .home-footer { position: absolute; bottom: 30px; width: 100%; text-align: center; z-index: 5; font-size: 0.7rem; color: #777; font-weight: 600; letter-spacing: 0.5px; }
-        .home-footer span { color: var(--dark); font-weight: 800; }
-
-        /* 2. BIBLIOTHÈQUE */
-        #library-screen { display: flex; flex-direction: column; height: 100%; }
-        .lib-header { padding: 15px; flex-shrink: 0; } 
-        .promo-container { padding: 0 15px; margin-bottom: 20px; flex-shrink: 0; }
-        .promo-card { width: 100%; height: 160px; border-radius: 0; overflow: hidden; position: relative; background: #000; }
-        .promo-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
-        .promo-content { position: absolute; bottom: 20px; left: 20px; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .promo-tag { font-size: 0.65rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px); margin-bottom: 6px; display: inline-block; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-        .promo-title { font-size: 1.5rem; font-weight: 800; line-height: 1.1; margin: 0; max-width: 80%; }
-        .tabs-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 15px 15px 15px; scrollbar-width: none; white-space: nowrap; flex-shrink: 0; -webkit-overflow-scrolling: touch; touch-action: pan-x; }
-        .tabs-scroll::-webkit-scrollbar { display: none; } 
-        .tab-btn { padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; background: var(--grey-light); color: #777; border: none; cursor: pointer; transition: all 0.2s; flex: 0 0 auto; }
-        .tab-btn.active { background: var(--dark); color: white; }
-        .tab-btn.custom-tab { background: #fff5f5; color: var(--red); }
-        .tab-btn.custom-tab.active { background: var(--red); color: white; }
-        .library-content { flex: 1; overflow-y: auto; padding: 0 15px 80px 15px; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
-        .levels-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 50px; }
-        .lvl-card { aspect-ratio: 1; border-radius: 8px; overflow: hidden; position: relative; background: #eee; cursor: pointer; }
-        .lvl-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background:#f0f0f0;}
-        .lvl-card:active img { transform: scale(0.98); }
-        .lvl-badge { position: absolute; bottom: 8px; right: 8px; background: rgba(255,255,255,0.9); color: var(--dark); padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .lvl-locked { position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+        /* --- BASE (INCHANGÉ) --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
+        body { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; color: #333; }
         
-        .custom-area { text-align: center; padding: 30px 20px; background: #fff; border-radius: 12px; border: 2px dashed #ddd; grid-column: span 2; display: flex; flex-direction: column; gap: 15px; }
-        .btn-upload { padding: 15px; background: var(--red); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(214,0,0,0.2); }
-        .diff-selector { display: flex; gap: 8px; justify-content: center; margin-top: 5px; }
-        .diff-btn { flex: 1; padding: 8px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+        /* ECRANS */
+        .screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: none; flex-direction: column; background: #f4f4f4; z-index: 10; 
+        }
+
+        /* 1. ACCUEIL */
+        #home { 
+            display: flex; background: #000; justify-content: center; align-items: center; text-align: center; color: white; 
+            z-index: 9999;
+        }
+        .logo-home { width: 140px; height: 140px; margin: 0 auto 20px auto; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,10 L90,25 L90,55 Q90,85 50,110 Q10,85 10,55 L10,25 Z' fill='%2300802b' stroke='white' stroke-width='3'/%3E%3Cpath d='M50,10 V110' stroke='rgba(255,255,255,0.2)' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
+        .btn-enter { margin-top: 50px; padding: 15px 50px; background: #000; border: 2px solid #fff; color: #fff; border-radius: 30px; font-weight: 800; font-size: 1.2rem; cursor: pointer; z-index: 100000; }
+
+        /* 2. MENU */
+        #menu { justify-content: center; align-items: center; position: relative; }
+        .top-icons { position: absolute; top: 20px; right: 20px; z-index: 20; }
+        .icon-btn { background: none; border: none; font-size: 1.5rem; margin-left: 10px; cursor: pointer; padding: 10px; }
+        .logo-menu { width: 150px; height: 150px; margin-bottom: 40px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,10 L70,10 L80,30 L75,60 L50,90 L25,60 L20,30 Z' fill='%2300802b' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }
+        .main-btn { width: 70%; max-width: 280px; padding: 18px; margin: 10px 0; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .green { background: #00802b; color: white; }
+        .white { background: white; color: #333; border: 1px solid #ccc; }
+        .red { background: #fff5f5; color: #d60000; margin-top: 20px; font-size: 0.7rem; }
+
+        /* 3. LIBRAIRIE */
+        #lib { background: #fff; }
+        .header { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .score-display { background: #00802b; color: white; padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 0.8rem; }
+        .ad-top { padding: 15px; flex-shrink: 0; }
+        .ad-card { width: 100%; height: 120px; background: #333; border-radius: 8px; overflow: hidden; position: relative; }
+        .ad-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .ad-txt { position: absolute; bottom: 10px; left: 10px; color: white; text-shadow: 0 2px 3px black; font-weight: bold; }
+        .cats-wrap { overflow-x: auto; white-space: nowrap; padding: 0 15px 10px; flex-shrink: 0; }
+        .cat-chip { display: inline-block; padding: 8px 16px; margin-right: 8px; border-radius: 20px; background: #f0f0f0; color: #666; font-weight: 700; font-size: 0.8rem; border: 1px solid #eee; cursor: pointer; }
+        .cat-chip.selected { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+        .grid-wrap { flex: 1; overflow-y: auto; padding: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 50px; }
+        .item { aspect-ratio: 1; background: #eee; border-radius: 10px; overflow: hidden; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+        .item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .badge { position: absolute; bottom: 6px; right: 6px; background: rgba(255,255,255,0.9); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
+        .lock { position: absolute; inset: 0; background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #555; }
+        .custom-area { grid-column: span 2; padding: 30px; text-align: center; border: 2px dashed #ddd; border-radius: 15px; }
+        .diff-buttons { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+        .diff-btn { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
         .diff-btn.selected { background: var(--dark); color: white; border-color: var(--dark); }
 
-        /* --- 3. BRIEFING SCREEN (NOUVEAU) --- */
-        #briefing-screen { background: #fff; display: flex; flex-direction: column; }
+        /* 4. BRIEFING */
+        #brief { background: #fff; }
+        .brief-top { height: 50vh; background: #eee; position: relative; flex-shrink: 0; }
+        .brief-img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-back-circle { position: absolute; top: 15px; left: 15px; width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+        .brief-info { flex: 1; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
+        .b-titre { font-size: 1.8rem; font-weight: 900; margin: 0; }
+        .b-niv { color: #00802b; font-weight: 700; margin-bottom: 5px; }
+        .b-desc { color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px; }
+        .btn-play { margin-top: auto; padding: 18px; background: #00802b; color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; box-shadow: 0 10px 25px rgba(0,128,43,0.3); width: 100%; flex-shrink: 0; }
+
+        /* 5. JEU */
+        #game { background: #fafafa; touch-action: none; }
+        .game-nav { height: 70px; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid #eee; flex-shrink: 0; }
+        .prog-wrap { flex: 1; margin: 0 15px; display: flex; flex-direction: column; justify-content: center; }
+        .prog-label { font-size: 0.6rem; color: #999; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+        .prog-bg { width: 100%; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+        .prog-fill { width: 0%; height: 100%; background: #00802b; transition: width 0.3s; }
+        .game-board { flex: 1; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; width: 100%; background: #f0f0f0; }
+        .puzzle-area { position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: white; }
+        .piece { position: absolute; touch-action: none; box-sizing: border-box; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.2); border-radius: 2px; z-index: 10; transition: transform 0.1s; }
+        .piece.dragging { z-index: 1000; transform: scale(1.1); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border: 1px solid #fff; }
+        .piece.locked { z-index: 1; pointer-events: none; box-shadow: none; border-radius: 0; border: none; filter: brightness(1.0); transition: all 0.3s ease; }
+        .game-bot { height: 70px; background: white; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 15px; flex-shrink: 0; }
+        .pub-strip { width: 100%; height: 50px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 6px; display: flex; align-items: center; padding: 0 10px; }
+        .pub-icon { width:30px; height:30px; background:#ccc; margin-right:10px; border-radius:4px; background-size:cover; flex-shrink:0; }
+
+        /* MODALS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; width: 85%; border-radius: 15px; text-align: center; }
+        .inp { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; margin: 10px 0; font-family: monospace; }
         
-        .briefing-img-container {
-            width: 100%; height: 45vh; /* 45% de la hauteur */
-            background: #f0f0f0; position: relative;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        .briefing-img { width: 100%; height: 100%; object-fit: cover; } /* Image complète */
-        
-        .briefing-back {
-            position: absolute; top: 20px; left: 20px;
-            width: 40px; height: 40px; background: white; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; border: none;
-            font-weight: 800; font-size: 1.2rem;
-        }
-
-        .briefing-content {
-            flex: 1; padding: 30px; 
-            display: flex; flex-direction: column;
-            overflow-y: auto; text-align: left;
-        }
-        .briefing-title {
-            font-size: 1.8rem; font-weight: 900; color: var(--dark);
-            margin: 0; line-height: 1.1; text-transform: uppercase;
-        }
-        .briefing-subtitle {
-            font-size: 0.9rem; font-weight: 700; color: var(--green);
-            margin: 10px 0 20px 0; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .briefing-desc {
-            font-size: 0.95rem; color: #555; line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .btn-play-game {
-            width: 100%; padding: 18px; 
-            background: var(--green); color: white;
-            border: none; border-radius: 12px;
-            font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(0,128,43,0.3); cursor: pointer;
-            transition: transform 0.1s; margin-top: auto; /* Pousse en bas */
-        }
-        .btn-play-game:active { transform: scale(0.98); }
-
-
-        /* 4. JEU UI */
-        #game-screen { background: #fff; display: flex; flex-direction: column; }
-        .game-header { height: 60px; background: white; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; z-index: 20; }
-        .gh-left { width: 40px; }
-        .gh-center { flex: 1; display: flex; justify-content: center; }
-        .gh-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; width: 60px; }
-        .game-prog-container { display: flex; flex-direction: column; align-items: center; width: 120px; gap: 2px; }
-        .gp-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
-        .gp-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.3s; }
-        .gp-text { font-size: 0.65rem; font-weight: 700; color: #bbb; letter-spacing: 1px; }
-        .score-pill { background: #fff; color: #f39c12; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 800; border: 1px solid #f0f0f0; display: flex; align-items: center; gap: 5px; }
-        .score-pill.pop { transform: scale(1.2); background: #fff8e1; border-color: #f39c12; }
-        
-        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative; }
-        .game-ad-banner { flex-shrink: 0; width: 92%; max-width: 400px; height: 55px; margin: 0 auto 20px auto; background: #fafafa; border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 10px; border-radius: 0; }
-        .ad-logo { width: 35px; height: 35px; background: #eee; margin-right: 12px; background-image: url('https://picsum.photos/seed/ad/100'); background-size: cover; flex-shrink: 0; }
-        .ad-content { display: flex; flex-direction: column; justify-content: center; }
-        .ad-line-1 { font-weight: 700; font-size: 0.8rem; color: var(--dark); line-height: 1.2; }
-        .ad-line-2 { font-size: 0.65rem; color: #888; margin-top: 1px; }
-
-        .board { background: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; display: grid; gap: 0; touch-action: none; }
-        .slot { width: 100%; height: 100%; position: relative; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05); }
-        .piece { width: 100%; height: 100%; position: absolute; top:0; left:0; background-repeat: no-repeat; cursor: grab; z-index: 1; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.1); border-radius: 1px; transition: transform 0.1s; background-color: #eee; touch-action: none; }
-        .piece.dragging { z-index: 1000; transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .piece.locked { z-index: 0; pointer-events: none; box-shadow: none; filter: brightness(1.02); }
-        .merged-top { border-top: none; } .merged-right { border-right: none; } .merged-bottom { border-bottom: none; } .merged-left { border-left: none; }
-        @keyframes flash { 0% { filter: brightness(1.5); } 100% { filter: brightness(1.02); } }
-        .just-locked { animation: flash 0.4s; }
-
-        /* MODALES */
-        .modal { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 200; display: none; justify-content: center; align-items: center; flex-direction: column; padding: 40px; text-align: center; }
-        .modal.active { display: flex; }
-        .modal img { width: 100%; max-height: 35vh; object-fit: contain; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #login-modal { background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 400; color: white;}
-        .login-box { background: white; padding: 30px; border-radius: 12px; width: 85%; max-width: 320px; color: var(--dark); text-align: center; }
-        .login-title { font-weight: 800; margin-bottom: 20px; font-size: 1.1rem; }
-        
-        #admin-panel { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; background: #fff; z-index: 300; transition: right 0.3s ease; display: flex; flex-direction: column; padding: 25px; overflow-y: auto; }
-        #admin-panel.open { right: 0; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0;}
-        .admin-title { font-size: 1.1rem; font-weight: 800; }
-        .close-admin { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-size: 0.8rem; text-transform: uppercase;}
-        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95rem; }
-        .btn-save { width: 100%; padding: 15px; background: var(--dark); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 0.9rem; margin-top: 10px; cursor: pointer; }
-        .preview-box { width: 100%; height: 120px; background: #f9f9f9; border-radius: 8px; margin-top: 10px; overflow: hidden; position: relative; border: 1px solid #eee;}
-        .preview-img { width: 100%; height: 100%; object-fit: cover; }
-
-        .btn-icon { background: white; border: 1px solid #f0f0f0; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; display:flex; justify-content:center; align-items:center; font-size:1rem; color:#333;}
-        .btn-modal { padding: 14px 40px; background: var(--green); color: white; border: none; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,128,43,0.2);}
-        .confetti { position: absolute; width: 8px; height: 8px; animation: fall 3s linear forwards; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+        /* ADMIN PANEL (MODIFIÉ POUR CREATION) */
+        #panel { position: fixed; top: 0; right: 0; width: 100%; height: 100%; background: white; z-index: 500; display: none; flex-direction: column; }
+        .panel-head { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; background: white; flex-shrink: 0; }
+        .panel-scroll { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+        .panel-footer-space { height: 50px; } 
+        .adm-section { margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee; text-align: left; }
+        .adm-header { font-weight: 900; color: #00802b; margin-bottom: 15px; display: block; border-bottom: 2px solid #00802b; padding-bottom: 5px; }
+        .adm-label { font-size: 0.7rem; font-weight: 700; color: #555; display: block; margin-top: 10px; }
+        .action-row { display: flex; gap: 10px; align-items: stretch; margin-bottom: 15px; }
+        input[type=file] { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="confetti-container" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;"></div>
-
-    <div id="home-screen" class="screen">
-        <div class="bg-slider">
-            <div class="bg-slide active" style="background-image: url('https://picsum.photos/seed/sahara1/1000/1500');"></div>
-            <div class="bg-slide" style="background-image: url('https://picsum.photos/seed/alger1/1000/1500');"></div>
-            <div class="bg-slide" style="background-image: url('https://picsum.photos/seed/tassili1/1000/1500');"></div>
-        </div>
-        <div class="home-overlay"></div>
-        <div class="home-content">
-            <div class="logo-box" id="secret-logo">
-                <div class="app-icon">🧩</div>
-                <h1 class="logo-text">PUZZLE DZ</h1>
-                <div class="logo-sub">AUTHENTIC ALGERIA</div>
-            </div>
-            <button class="btn-start" onclick="startApp()">COMMENCER</button>
-        </div>
-        <div class="home-footer">CREATED BY : <span>ASSSIREM MEDIA</span></div>
-    </div>
-
-    <div id="login-modal" class="modal">
-        <div class="login-box">
-            <div class="login-title">🔒 Espace Admin</div>
-            <input type="password" id="admin-pass" class="form-input" placeholder="Code secret" style="margin-bottom:15px; text-align:center;">
-            <button class="btn-save" onclick="checkPassword()">ENTRER</button>
-            <button onclick="closeLogin()" style="background:none; border:none; color:#999; margin-top:15px; font-size:0.8rem; text-decoration:underline;">Annuler</button>
+    <div id="home" class="screen active">
+        <div>
+            <div class="logo-home"></div>
+            <h1 style="font-size:3rem; margin:0; font-weight:900;">PUZZLE DZ</h1>
+            <div style="color:#00802b; font-weight:700; letter-spacing:3px;">AUTHENTIC ALGERIA</div>
+            <button class="btn-enter" onclick="document.getElementById('home').style.display='none'; document.getElementById('menu').style.display='flex'; setTimeout(startSystem, 50);">ENTRER</button>
         </div>
     </div>
 
-    <div id="admin-panel">
-        <div class="admin-header">
-            <div class="admin-title">Configuration</div>
-            <button class="close-admin" onclick="closeAdmin()">✕</button>
+    <div id="menu" class="screen">
+        <div class="top-icons">
+            <button class="icon-btn" onclick="openAdminModal()">🔒</button>
+            <button class="icon-btn" onclick="alert('Version 85 - Builder Mode')">⚙️</button>
         </div>
-        <div class="form-group"><label class="form-label">Titre Promo</label><input type="text" id="admin-title" class="form-input" value="Merveilles du Sahara"></div>
-        <div class="form-group"><label class="form-label">Badge Promo</label><input type="text" id="admin-tag" class="form-input" value="Puzzle sélectionné"></div>
-        <div class="form-group"><label class="form-label">Image Bannière</label><input type="file" id="admin-file" class="form-input" accept="image/*" onchange="handleFileSelect(event)"><div class="preview-box"><img id="admin-preview" class="preview-img" src="https://picsum.photos/seed/sahara/600/300"></div></div>
-        <div style="border-top:1px solid #f0f0f0; margin:25px 0;"></div>
-        <div class="form-group"><label class="form-label">Pub In-Game L1</label><input type="text" id="admin-game-l1" class="form-input" value="Découvrez l'Algérie"></div>
-        <div class="form-group"><label class="form-label">Pub In-Game L2</label><input type="text" id="admin-game-l2" class="form-input" value="Visitez nos partenaires"></div>
-        <button class="btn-save" onclick="saveAdminData()">SAUVEGARDER</button>
-        <button onclick="hardReset()" style="width:100%; margin-top:20px; background:white; color:#e74c3c; border:1px solid #e74c3c; padding:12px; border-radius:8px; font-weight:700; font-size:0.8rem;">RÉPARER L'APPLICATION</button>
+        <div class="logo-menu"></div>
+        <button class="main-btn green" onclick="nav('lib')">NOUVELLE PARTIE</button>
+        <button class="main-btn white" onclick="resume()">REPRENDRE</button>
+        <button class="main-btn red" onclick="resetAll()">RÉINITIALISER TOUT</button>
     </div>
 
-    <div id="library-screen" class="screen hidden">
-        <div class="lib-header"></div> 
-        <div class="promo-container">
-            <div class="promo-card">
-                <img id="promo-img" src="" class="promo-img">
-                <div class="promo-content"><div id="promo-tag" class="promo-tag"></div><div id="promo-title" class="promo-title"></div></div>
+    <div id="lib" class="screen">
+        <div class="header">
+            <b>PUZZLE DZ</b>
+            <div class="score-display">💎 <span id="sc1">0</span></div>
+        </div>
+        <div class="ad-top">
+            <div class="ad-card">
+                <img id="ad-top-img" src="" class="ad-img">
+                <div class="ad-txt" id="pub-h-txt">...</div>
             </div>
         </div>
-        <div class="tabs-scroll" id="tabs-container"></div>
-        <div class="library-content"><div class="levels-grid" id="levels-grid"></div></div>
-    </div>
-
-    <div id="briefing-screen" class="screen hidden">
-        <div class="briefing-img-container">
-            <button class="briefing-back" onclick="backToLibrary()">❮</button>
-            <img id="briefing-img" class="briefing-img" src="">
-        </div>
-        <div class="briefing-content">
-            <h1 id="briefing-title" class="briefing-title">TITRE</h1>
-            <h3 id="briefing-subtitle" class="briefing-subtitle">SOUS-TITRE</h3>
-            <p id="briefing-desc" class="briefing-desc">Description</p>
-            <button class="btn-play-game" onclick="startGame()">COMMENCER LE PUZZLE</button>
+        <div class="cats-wrap" id="cats"></div>
+        <div class="grid-wrap">
+            <div class="grid" id="grid"></div>
         </div>
     </div>
 
-    <div id="game-screen" class="screen hidden">
-        <div class="game-header">
-            <div class="gh-left"><button class="btn-icon" onclick="backToLibrary()">❮</button></div>
-            <div class="gh-center">
-                <div class="game-prog-container">
-                    <div class="gp-text" id="gp-text">0/24</div>
-                    <div class="gp-bar"><div id="gp-fill" class="gp-fill"></div></div>
+    <div id="brief" class="screen">
+        <div class="brief-top">
+            <div class="btn-back-circle" onclick="nav('lib')">❮</div>
+            <img id="brief-img" class="brief-img" src="">
+        </div>
+        <div class="brief-info">
+            <h2 id="b-titre" style="margin:0;">TITRE</h2>
+            <div id="b-niv" style="color:#00802b; font-weight:bold; margin-top:5px;">NIVEAU 1</div>
+            <p id="b-desc" class="b-desc">...</p>
+            <button class="btn-play" onclick="playGame()">COMMENCER LE PUZZLE</button>
+        </div>
+    </div>
+
+    <div id="game" class="screen">
+        <div class="game-nav">
+            <button class="icon-btn" onclick="nav('lib')">❮</button>
+            <div class="prog-wrap"><div class="prog-label">PROGRESSION</div><div class="prog-bg"><div id="prog-bar" class="prog-fill"></div></div></div>
+            <div style="font-weight:bold;">💎 <span id="sc2">0</span></div>
+        </div>
+        <div class="game-board" id="zone">
+            <div id="plateau" class="puzzle-area"></div>
+        </div>
+        <div class="game-bot">
+            <div class="pub-strip">
+                <div id="ad-bot-icon" class="pub-icon"></div>
+                <div><b style="font-size:0.8rem; display:block;" id="ad-bot-title">TITRE</b><span style="font-size:0.6rem; color:#777;" id="ad-bot-sub">...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="modal">
+        <div class="modal-box">
+            <h3>Admin</h3>
+            <input type="password" id="pass" class="inp" placeholder="Code (1234)">
+            <button class="main-btn green" style="width:100%" onclick="checkPass()">OK</button>
+            <button onclick="document.getElementById('modal-admin').style.display='none'" style="margin-top:10px; background:none; border:none;">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modal-win" class="modal">
+        <div class="modal-box">
+            <h2 style="color:#00802b">BRAVO !</h2>
+            <p>+15 Points</p>
+            <img id="win-img" src="" style="width:100%; border-radius:10px; margin-bottom:10px;">
+            <button class="main-btn green" onclick="nextLvl()">CONTINUER</button>
+        </div>
+    </div>
+
+    <div id="panel">
+        <div class="panel-head">
+            <b>ADMINISTRATION</b>
+            <button class="icon-btn" onclick="document.getElementById('panel').style.display='none'">✕</button>
+        </div>
+        <div class="panel-scroll">
+            <div class="adm-section">
+                <span class="adm-header">1. GESTION DES PUBS</span>
+                <span class="adm-label">Pub Haut (Image) :</span><input id="v1-img" class="inp">
+                <span class="adm-label">Pub Haut (Titre) :</span><input id="v1-title" class="inp">
+                <hr style="margin:15px 0; border:0; border-top:1px dashed #ddd;">
+                <span class="adm-label">Pub Bas (Icône) :</span><input id="v2-icon" class="inp">
+                <span class="adm-label">Pub Bas (Titre) :</span><input id="v2-title" class="inp">
+                <span class="adm-label">Pub Bas (Sous-titre) :</span><input id="v2-sub" class="inp">
+            </div>
+
+            <div class="adm-section">
+                <span class="adm-header">2. CRÉER TES CATÉGORIES</span>
+                <div class="action-row">
+                    <select id="sel-cat" class="inp" style="flex:1; margin:0;" onchange="loadCatEdit()"></select>
+                    <button class="main-btn green" style="width:auto; padding:0 15px; margin:0; font-size:1.2rem;" onclick="addCat()">+</button>
+                    <button class="main-btn red" style="width:auto; padding:0 15px; margin:0; font-size:1.2rem;" onclick="delCat()">🗑️</button>
+                </div>
+                
+                <div style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd;">
+                    <span class="adm-label">Nom de la catégorie :</span>
+                    <input id="v3-name" class="inp" placeholder="Ex: Mes Voitures">
+                    
+                    <span class="adm-label">Lien Image ou Mot-clé :</span>
+                    <input id="v3-key" class="inp" placeholder="Ex: algeria OU https://mon-site.com/img.jpg">
+                    <small style="color:#777; font-size:0.7rem;">Si c'est un lien direct (http...), l'image sera fixe. Si c'est un mot, images aléatoires.</small>
+                    
+                    <span class="adm-label">Description de présentation :</span>
+                    <textarea id="v3-desc" class="inp" rows="3" placeholder="Texte affiché avant le puzzle..."></textarea>
+                    
+                    <button class="main-btn green" style="width:100%; padding:10px; margin-top:10px;" onclick="applyCatUpdate()">VALIDER LES MODIFICATIONS</button>
                 </div>
             </div>
-            <div class="gh-right"><div class="score-pill" id="score-container">💎 <span id="score-display">0</span></div></div>
-        </div>
-        <div class="game-area" id="game-area"><div id="board" class="board"></div></div>
-        <div class="game-ad-banner">
-            <div class="ad-logo"></div>
-            <div class="ad-content"><div class="ad-line-1" id="game-ad-l1"></div><div class="ad-line-2" id="game-ad-l2"></div></div>
+
+            <button class="main-btn green" style="width:100%; margin-bottom:10px;" onclick="saveAll()">💾 SAUVEGARDER TOUT</button>
+            <button class="main-btn red" style="width:100%" onclick="resetFactory()">⚠️ RESET USINE</button>
+            <div class="panel-footer-space"></div>
         </div>
     </div>
 
-    <div id="win-modal" class="modal">
-        <h2 style="color:var(--green); margin-bottom:10px;">MAGNIFIQUE !</h2>
-        <h3 style="color:#f1c40f; margin:0 0 15px 0;">+15 Points 💎</h3>
-        <img id="win-img" src="">
-        <button class="btn-modal" onclick="nextLvl()">CONTINUER</button>
-    </div>
-
-    <input type="file" id="custom-file-input" accept="image/*" style="display:none;" onchange="processCustomImage(event)">
+    <input type="file" id="file" onchange="fileUp(event)">
 
     <script>
-        // --- DONNÉES ---
-        // Texte riche pour la présentation (simulé)
-        const SAMPLE_DESC = "Ce paysage emblématique représente la richesse culturelle et naturelle de l'Algérie. Découvrez chaque détail en assemblant les pièces de ce puzzle unique.";
-        
-        const cats = [
-            { id: 'custom', t: "📸 Créez le vôtre" },
-            { id: 'nature', t: "Nature", img: "https://picsum.photos/seed/nature/200" },
-            { id: 'history', t: "Histoire", img: "https://picsum.photos/seed/history/200" },
-            { id: 'culture', t: "Culture", img: "https://picsum.photos/seed/culture/200" },
-            { id: 'food', t: "Cuisine", img: "https://picsum.photos/seed/food/200" },
-            { id: 'arch', t: "Villes", img: "https://picsum.photos/seed/arch/200" },
-            { id: 'sahara', t: "Sahara", img: "https://picsum.photos/seed/sahara/200" },
-            { id: 'sea', t: "Mer", img: "https://picsum.photos/seed/sea/200" },
-            { id: 'art', t: "Art", img: "https://picsum.photos/seed/art/200" },
-            { id: 'craft', t: "Artisanat", img: "https://picsum.photos/seed/craft/200" },
-            { id: 'trad', t: "Tradition", img: "https://picsum.photos/seed/trad/200" },
-            { id: 'animals', t: "Faune", img: "https://picsum.photos/seed/animals/200" },
-            { id: 'mosaic', t: "Mosaïque", img: "https://picsum.photos/seed/mosaic/200" }
+        // --- DONNEES MINIMALISTES ---
+        // On ne garde que "custom" pour que le système marche. Le reste est vide.
+        var defCats = [
+            {id:'custom', n:'📸 Perso', k:'', d:'Importez vos propres photos depuis la galerie.'}
         ];
-
-        const gameDB = {};
-        cats.forEach(c => {
-            if(c.id === 'custom') return;
-            const lvls = [];
-            for(let i=0; i<50; i++){
-                let p = 24; if(i >= 10) p = 32; if(i >= 30) p = 40; 
-                lvls.push({
-                    p: p, t: `${c.t} ${i+1}`,
-                    sub: `Niveau ${i+1} - ${p} Pièces`,
-                    desc: SAMPLE_DESC,
-                    img: `https://picsum.photos/seed/${c.id}${i}/600/600`
-                });
-            }
-            gameDB[c.id] = lvls;
-        });
-
-        // --- ETAT ---
-        let activeCat = 'custom', currIdx = 0, userScore = 0;
-        let dragged = null, startX=0, startY=0, slotW=0, slotH=0, originSlot=null;
-        let gCols = 0, gRows = 0; 
-        let customImageSrc = "";
-        let customPieces = 24;
-        let pressTimer;
-
-        let promoData = { 
-            title: "Merveilles du Sahara", tag: "Puzzle sélectionné", 
-            img: "https://picsum.photos/seed/sahara/600/300",
-            gameL1: "Découvrez l'Algérie", gameL2: "Visitez nos partenaires"
+        
+        var defAds = {
+            top: { img: 'https://via.placeholder.com/600x300', t: 'Votre Pub Ici' },
+            bot: { icon: 'https://via.placeholder.com/100', t: 'Titre Pub', s: 'Sous-titre' }
         };
 
-        window.onload = function() {
+        var cats = JSON.parse(JSON.stringify(defCats));
+        var ads = JSON.parse(JSON.stringify(defAds));
+        var score=0, cat='custom', lvl=0, imgUrl="", customPieces=24;
+
+        // --- SYSTEME ---
+        function startSystem() {
             try {
-                loadUserData(); loadAdminData(); updatePromoUI();
-                renderTabs(); renderGrid(); setupSecretAdmin(); startSlideshow();
-            } catch(e) { hardReset(); }
-        };
-
-        function startApp() { nav('library-screen'); }
-
-        // --- SLIDESHOW ---
-        function startSlideshow() {
-            const slides = document.querySelectorAll('.bg-slide');
-            let index = 0;
-            setInterval(() => {
-                slides[index].classList.remove('active');
-                index = (index + 1) % slides.length;
-                slides[index].classList.add('active');
-            }, 6000);
+                var sCats = localStorage.getItem('pz_cats_v85'); // Nouvelle clé v85
+                if(sCats) cats = JSON.parse(sCats);
+                var sAds = localStorage.getItem('pz_ads_v85');
+                if(sAds) ads = JSON.parse(sAds);
+                var sSc = localStorage.getItem('pz_score');
+                if(sSc) score = parseInt(sSc);
+            } catch(e){}
+            updateScore();
+            drawTabs();
+            applyAds();
         }
 
-        // --- NAVIGATION ---
         function nav(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            const el = document.getElementById(id);
-            if(el) el.classList.remove('hidden');
+            var ss = document.querySelectorAll('.screen');
+            for(var i=0; i<ss.length; i++) if(ss[i].id!=='panel') ss[i].style.display='none';
+            document.getElementById(id).style.display='flex';
+            if(id==='lib') drawGrid();
         }
 
-        // --- BRIEFING LOGIC (NOUVEAU) ---
-        function showBriefing(isCustom) {
-            let img, t, sub, desc;
+        function updateScore() {
+            document.getElementById('sc1').innerText = score;
+            document.getElementById('sc2').innerText = score;
+        }
+
+        function applyAds() {
+            document.getElementById('ad-top-img').src = ads.top.img;
+            document.getElementById('pub-h-txt').innerText = ads.top.t;
+            document.getElementById('ad-bot-icon').style.backgroundImage = 'url('+ads.bot.icon+')';
+            document.getElementById('ad-bot-title').innerText = ads.bot.t;
+            document.getElementById('ad-bot-sub').innerText = ads.bot.s;
+        }
+
+        // --- LIBRAIRIE ---
+        function drawTabs() {
+            var c = document.getElementById('cats'); c.innerHTML = '';
+            // Si aucune cat (bug), on remet custom
+            if(cats.length === 0) cats = JSON.parse(JSON.stringify(defCats));
             
-            if(isCustom) {
-                img = customImageSrc;
-                t = "VOTRE PHOTO";
-                sub = `PUZZLE PERSONNALISÉ - ${customPieces} PIÈCES`;
-                desc = "Vous avez importé cette image depuis votre galerie. Reconstituez vos propres souvenirs !";
-            } else {
-                const lvl = gameDB[activeCat][currIdx];
-                img = lvl.img;
-                t = lvl.t;
-                sub = lvl.sub;
-                desc = lvl.desc;
-            }
-
-            document.getElementById('briefing-img').src = img;
-            document.getElementById('briefing-title').innerText = t;
-            document.getElementById('briefing-subtitle').innerText = sub;
-            document.getElementById('briefing-desc').innerText = desc;
-            
-            nav('briefing-screen');
-        }
-
-        function startGame() {
-            // C'est ici qu'on lance vraiment le jeu
-            if(activeCat === 'custom') {
-                launchCustomBoard();
-            } else {
-                launchStandardBoard();
-            }
-            nav('game-screen');
-        }
-
-        // --- LIBRARY LOGIC ---
-        function renderTabs() {
-            const container = document.getElementById('tabs-container');
-            if(!container) return;
-            container.innerHTML = '';
-            cats.forEach(c => {
-                const btn = document.createElement('button');
-                btn.className = `tab-btn ${c.id === activeCat ? 'active' : ''}`;
-                if(c.id === 'custom') btn.classList.add('custom-tab');
-                btn.innerText = c.t;
-                btn.onclick = () => selectTab(c.id);
-                container.appendChild(btn);
+            cats.forEach(function(x){
+                var b = document.createElement('button');
+                b.className = 'cat-chip' + (x.id===cat ? ' selected' : '');
+                b.innerText = x.n;
+                b.onclick = function(){ cat=x.id; drawTabs(); drawGrid(); };
+                c.appendChild(b);
             });
+            // Si la cat active n'existe plus, on switch sur la première
+            if(!cats.find(function(x){return x.id===cat})) {
+                cat = cats[0].id;
+                drawTabs(); // Redessine avec la bonne selection
+            }
         }
 
-        function selectTab(id) { activeCat = id; renderTabs(); renderGrid(); }
-
-        function renderGrid() {
-            const container = document.getElementById('levels-grid');
-            if(!container) return;
-            container.innerHTML = '';
-
-            if(activeCat === 'custom') {
-                container.innerHTML = `
-                    <div class="custom-area">
-                        <span class="custom-icon">📸</span>
-                        <div style="font-weight:700; color:#555;">Importez votre propre photo</div>
-                        <div class="diff-selector">
-                            <div class="diff-btn ${customPieces===24?'selected':''}" onclick="setCustomDiff(24)">Facile</div>
-                            <div class="diff-btn ${customPieces===32?'selected':''}" onclick="setCustomDiff(32)">Moyen</div>
-                            <div class="diff-btn ${customPieces===40?'selected':''}" onclick="setCustomDiff(40)">Difficile</div>
-                        </div>
-                        <button class="btn-upload" onclick="triggerUpload()">IMPORTER ET JOUER</button>
-                    </div>
-                `;
+        function drawGrid() {
+            var g = document.getElementById('grid'); g.innerHTML = '';
+            
+            // Mode Perso Spécial
+            if(cat === 'custom') {
+                g.innerHTML = `<div class="custom-area"><div style="font-size:3rem">📸</div><b>Importez votre photo</b><div class="diff-buttons"><button class="diff-btn" onclick="customPieces=24;drawGrid()">Facile</button><button class="diff-btn" onclick="customPieces=32;drawGrid()">Moyen</button></div><button class="main-btn green" onclick="document.getElementById(\'file\').click()">CHOISIR</button></div>`;
                 return;
             }
 
-            const levels = gameDB[activeCat] || [];
-            let max = parseInt(localStorage.getItem('pz_'+activeCat)) || 0;
+            // Catégories Créées par l'User
+            var currentCatObj = cats.find(function(x){return x.id===cat});
+            if(!currentCatObj) return;
 
-            levels.forEach((l, i) => {
-                const card = document.createElement('div');
-                card.className = 'lvl-card';
-                card.innerHTML = `<img src="${l.img}" loading="lazy">${i > max ? '<div class="lvl-locked">🔒</div>' : `<div class="lvl-badge">Niv ${i+1}</div>`}`;
-                if(i <= max) card.onclick = () => preLaunch(i);
-                container.appendChild(card);
-            });
-        }
+            var max = 0; try { max = parseInt(localStorage.getItem('pz_prog_'+cat)) || 0; } catch(e){}
+            var k = currentCatObj.k; // Le lien ou mot clé
 
-        function preLaunch(i) {
-            currIdx = i;
-            showBriefing(false);
-        }
-
-        // --- CUSTOM LOGIC ---
-        function setCustomDiff(p) { customPieces = p; renderGrid(); }
-        function triggerUpload() { document.getElementById('custom-file-input').click(); }
-        function processCustomImage(event) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    customImageSrc = e.target.result;
-                    showBriefing(true); // Aller au briefing avec l'image custom
-                };
-                reader.readAsDataURL(file);
+            for(var i=0; i<20; i++) {
+                var d=document.createElement('div'); d.className='item';
+                
+                // Logique URL : Si commence par http, c'est un lien direct (fixe). Sinon c'est un mot clé LoremFlickr.
+                var u = (k.indexOf('http')===0) ? k : 'https://loremflickr.com/320/320/'+k+'?lock='+i;
+                
+                var lk = i > max;
+                d.innerHTML='<img src="'+u+'" onerror="this.src=\'https://via.placeholder.com/300?text=Image\'">' + (lk?'<div class="lock">🔒</div>':'<div class="badge">Niv '+(i+1)+'</div>');
+                if(!lk) (function(url, idx){ d.onclick=function(){ openBrief(url, idx); } })(u, i);
+                g.appendChild(d);
             }
         }
 
-        function launchCustomBoard() {
-            const customLvl = { p: customPieces, img: customImageSrc };
-            document.getElementById('gp-fill').style.width = '0%';
-            document.getElementById('gp-text').innerText = `0/${customLvl.p}`;
-            buildBoard(customLvl);
+        function openBrief(u, i) {
+            imgUrl = u; lvl = i;
+            document.getElementById('brief-img').src = u;
+            var cObj = cats.find(function(x){return x.id===cat});
+            document.getElementById('b-titre').innerText = cObj.n.toUpperCase();
+            document.getElementById('b-niv').innerText = 'NIVEAU ' + (i+1);
+            document.getElementById('b-desc').innerText = cObj.d || "";
+            nav('brief');
         }
 
-        function launchStandardBoard() {
-            const lvl = gameDB[activeCat][currIdx];
-            document.getElementById('gp-fill').style.width = '0%';
-            document.getElementById('gp-text').innerText = `0/${lvl.p}`;
-            buildBoard(lvl);
+        // --- JEU (INCHANGÉ & STABLE) ---
+        function playGame() {
+            var saveState = { cat: cat, lvl: lvl, img: imgUrl, nb: (cat==='custom' ? customPieces : 24) };
+            localStorage.setItem('pz_last', JSON.stringify(saveState));
+            nav('game');
+            document.getElementById('prog-bar').style.width = '0%';
+            setTimeout(createBoard, 300);
         }
 
-        function backToLibrary() { nav('library-screen'); renderGrid(); }
+        function resume() { 
+            try {
+                var l = JSON.parse(localStorage.getItem('pz_last')); 
+                if(l) {
+                    cat = l.cat; lvl = l.lvl; imgUrl = l.img;
+                    if(l.nb) customPieces = l.nb;
+                    playGame();
+                } else { alert("Aucune partie trouvée."); }
+            } catch(e) { console.log(e); } 
+        }
 
-        // --- GAME ENGINE ---
-        function buildBoard(lvl) {
-            const board = document.getElementById('board');
-            board.innerHTML = '';
-            let w = window.innerWidth - 30; let h = window.innerHeight - 180;
-            if(w < 300) w = 300; if(h < 400) h = 400;
-            let dims = calculateGrid(lvl.p, w, h);
-            gCols = dims.c; gRows = dims.r;
-            let size = Math.floor(Math.min(w/gCols, h/gRows));
-            
-            board.style.width = (size * gCols) + 'px';
-            board.style.height = (size * gRows) + 'px';
-            board.style.gridTemplateColumns = `repeat(${gCols}, 1fr)`;
-            board.style.gridTemplateRows = `repeat(${gRows}, 1fr)`;
-
-            let ids = [...Array(lvl.p).keys()].sort(() => Math.random() - 0.5);
-            
-            for(let i=0; i<lvl.p; i++) {
-                let slot = document.createElement('div');
-                slot.className = 'slot'; slot.dataset.idx = i;
-                let pid = ids[i];
-                let p = document.createElement('div');
-                p.className = 'piece'; p.dataset.id = pid;
-                let cx = pid % gCols; let cy = Math.floor(pid / gCols);
-                p.style.backgroundImage = `url(${lvl.img})`;
-                p.style.backgroundSize = `${size * gCols}px ${size * gRows}px`;
-                p.style.backgroundPosition = `-${cx * size}px -${cy * size}px`;
-                p.onpointerdown = dragStart;
-                slot.appendChild(p); board.appendChild(slot);
-                if(pid === i) lock(p);
+        function createBoard() {
+            var z = document.getElementById('zone'); 
+            var p = document.getElementById('plateau'); 
+            p.innerHTML = '';
+            var wAvailable = z.clientWidth - 20; 
+            var hAvailable = z.clientHeight - 20;
+            if(wAvailable < 100) wAvailable = window.innerWidth - 20;
+            var nbPieces = (cat==='custom') ? customPieces : 24;
+            var cols = 4; var rows = Math.ceil(nbPieces / cols);
+            var size = Math.floor(Math.min(wAvailable/cols, hAvailable/rows));
+            p.style.width = (size*cols)+'px'; p.style.height = (size*rows)+'px';
+            var ids=[]; for(var k=0; k<nbPieces; k++) ids.push(k);
+            var posInit = []; for(var k=0; k<nbPieces; k++) posInit.push(k);
+            posInit.sort(function(){return 0.5-Math.random()});
+            for(var i=0; i<nbPieces; i++) {
+                var div=document.createElement('div'); div.className='piece';
+                div.style.width=size+'px'; div.style.height=size+'px';
+                div.style.backgroundImage='url('+imgUrl+')';
+                div.style.backgroundSize=(size*cols)+'px '+(size*rows)+'px';
+                var pid=ids[i]; var cx=pid%cols; var cy=Math.floor(pid/cols);
+                div.style.backgroundPosition='-'+(cx*size)+'px -'+(cy*size)+'px';
+                div.dataset.tx = cx*size; div.dataset.ty = cy*size;
+                var rand=posInit[i];
+                div.style.left=(rand%cols)*size+'px'; div.style.top=Math.floor(rand/cols)*size+'px';
+                div.addEventListener('touchstart', dragStart, {passive:false});
+                div.addEventListener('mousedown', dragStart);
+                p.appendChild(div);
             }
-            checkFusions();
         }
-
-        function calculateGrid(total, w, h) {
-            if(w<=0) w=300; if(h<=0) h=500;
-            let ratio = w/h;
-            let bestC=1, bestR=total, bestDiff=999;
-            for(let c=1; c<=total; c++){
-                if(total%c===0){
-                    let r = total/c;
-                    let diff = Math.abs((c/r)-ratio);
-                    if(diff<bestDiff) { bestDiff=diff; bestC=c; bestR=r; }
-                }
-            }
-            return {c:bestC, r:bestR};
-        }
-
+        var dragged=null, startX, startY, oL, oT;
         function dragStart(e) {
-            e.preventDefault();
-            let p = e.target;
-            if(p.classList.contains('locked')) return;
-            dragged = p; originSlot = p.parentNode;
-            p.setPointerCapture(e.pointerId);
-            startX = e.clientX; startY = e.clientY;
-            p.classList.add('dragging'); p.style.zIndex = 1000;
-            p.onpointermove = dragMove; p.onpointerup = dragEnd;
+            if(e.target.classList.contains('locked')) return;
+            e.preventDefault(); 
+            dragged=e.target; dragged.classList.add('dragging');
+            var pt=e.touches?e.touches[0]:e; startX=pt.clientX; startY=pt.clientY;
+            oL=parseInt(dragged.style.left); oT=parseInt(dragged.style.top);
+            if(e.type=='touchstart') { window.addEventListener('touchmove', move, {passive:false}); window.addEventListener('touchend', end); }
+            else { window.addEventListener('mousemove', move); window.addEventListener('mouseup', end); }
         }
-
-        function dragMove(e) {
-            if(!dragged) return;
-            dragged.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px)`;
+        function move(e) {
+            if(!dragged) return; e.preventDefault();
+            var pt=e.touches?e.touches[0]:e;
+            dragged.style.transform = 'translate('+(pt.clientX-startX)+'px, '+(pt.clientY-startY)+'px)';
         }
-
-        function dragEnd(e) {
+        function end(e) {
             if(!dragged) return;
-            let p = dragged;
-            p.onpointermove = null; p.onpointerup = null;
-            p.releasePointerCapture(e.pointerId);
-            p.classList.remove('dragging'); p.style.transform = 'none'; p.style.zIndex = '';
-            p.style.visibility = 'hidden';
-            let el = document.elementFromPoint(e.clientX, e.clientY);
-            p.style.visibility = 'visible';
-            let targetSlot = el ? el.closest('.slot') : null;
+            window.removeEventListener('touchmove', move); window.removeEventListener('touchend', end);
+            window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', end);
+            dragged.classList.remove('dragging');
+            var pt=e.changedTouches?e.changedTouches[0]:e;
+            var finalL=oL+(pt.clientX-startX); var finalT=oT+(pt.clientY-startY);
+            var targetL=parseInt(dragged.dataset.tx); var targetT=parseInt(dragged.dataset.ty);
+            dragged.style.transform = 'none';
+            if(Math.hypot(finalL-targetL, finalT-targetT) < 40) { dragged.style.left=targetL+'px'; dragged.style.top=targetT+'px'; dragged.classList.add('locked'); } 
+            else { dragged.style.left=finalL+'px'; dragged.style.top=finalT+'px'; }
+            dragged=null; checkWin();
+        }
+        function checkWin() {
+            var all = document.querySelectorAll('.piece');
+            var locked = document.querySelectorAll('.piece.locked');
+            document.getElementById('prog-bar').style.width = ((locked.length/all.length)*100) + '%';
+            if(locked.length === all.length && all.length > 0) {
+                score+=15; try{localStorage.setItem('pz_score',score)}catch(e){}
+                updateScore();
+                try{var max=parseInt(localStorage.getItem('pz_prog_'+cat))||0; if(lvl==max) localStorage.setItem('pz_prog_'+cat, max+1);}catch(e){}
+                document.getElementById('win-img').src=imgUrl;
+                document.getElementById('modal-win').style.display='flex';
+            }
+        }
+        function fileUp(e) { var fr=new FileReader(); fr.onload=function(ev){openBrief(ev.target.result,0)}; fr.readAsDataURL(e.target.files[0]); }
+        function resetAll() { if(confirm('Sûr ?')){localStorage.clear();location.reload();} }
+        function nextLvl() { document.getElementById('modal-win').style.display='none'; nav('lib'); }
+
+        // --- ADMIN AVANCE ---
+        function openAdminModal() { document.getElementById('modal-admin').style.display='flex'; }
+        function checkPass() { if(document.getElementById('pass').value=='1234'){document.getElementById('modal-admin').style.display='none'; initAdminPanel(); document.getElementById('panel').style.display='flex';} }
+        
+        function initAdminPanel() {
+            // Pubs
+            document.getElementById('v1-img').value = ads.top.img;
+            document.getElementById('v1-title').value = ads.top.t;
+            document.getElementById('v2-icon').value = ads.bot.icon;
+            document.getElementById('v2-title').value = ads.bot.t;
+            document.getElementById('v2-sub').value = ads.bot.s;
             
-            if(targetSlot && targetSlot !== originSlot) {
-                let resident = targetSlot.children[0];
-                if(!resident || !resident.classList.contains('locked')) {
-                    if(resident) originSlot.appendChild(resident);
-                    targetSlot.appendChild(p);
-                    check(p, targetSlot);
-                    if(resident) check(resident, originSlot);
-                    checkFusions();
-                    
-                    let lockedCount = document.querySelectorAll('.piece.locked').length;
-                    let total = (activeCat === 'custom') ? customPieces : gameDB[activeCat][currIdx].p;
-                    document.getElementById('gp-text').innerText = `${lockedCount}/${total}`;
-                    document.getElementById('gp-fill').style.width = (lockedCount/total)*100 + '%';
-                    if(lockedCount === total) { confetti(); setTimeout(showWin, 1000); }
-                }
-            }
-            dragged = null;
+            // Liste des catégories
+            refreshCatSelect();
+            loadCatEdit();
         }
 
-        function check(p, slot) { if(parseInt(p.dataset.id) === parseInt(slot.dataset.idx)) lock(p); }
-        function lock(p) { if(!p.classList.contains('locked')) { p.classList.add('locked', 'just-locked'); setTimeout(()=>p.classList.remove('just-locked'), 500); } p.onpointerdown = null; }
-
-        function checkFusions() {
-            document.querySelectorAll('.piece').forEach(p => p.classList.remove('merged-top','merged-right','merged-bottom','merged-left'));
-            const slots = document.querySelectorAll('.slot');
-            for(let i=0; i<slots.length; i++){
-                let p = slots[i].children[0];
-                if(!p) continue;
-                let id = parseInt(p.dataset.id);
-                if(gCols === 0) return;
-                let r = Math.floor(i/gCols); let c = i%gCols;
-                if(c < gCols-1) { let nextP = slots[i+1].children[0]; if(nextP && parseInt(nextP.dataset.id) === id+1) { p.classList.add('merged-right'); nextP.classList.add('merged-left'); } }
-                if(r < gRows-1) { let botP = slots[i+gCols].children[0]; if(botP && parseInt(botP.dataset.id) === id+gCols) { p.classList.add('merged-bottom'); botP.classList.add('merged-top'); } }
-            }
+        function refreshCatSelect() {
+            var sel = document.getElementById('sel-cat'); sel.innerHTML = '';
+            cats.forEach(function(c, i){
+                var opt = document.createElement('option');
+                opt.value = i; 
+                opt.innerText = c.n + (c.id==='custom' ? ' (Système)' : ''); 
+                sel.appendChild(opt);
+            });
         }
 
-        function confetti() {
-            let c = document.getElementById('confetti-container'); c.style.display='block';
-            for(let i=0; i<50; i++){
-                let d = document.createElement('div'); d.className = 'confetti';
-                d.style.left = Math.random()*100+'vw'; d.style.background = `hsl(${Math.random()*360}, 100%, 50%)`;
-                d.style.animationDuration = (Math.random()*2+2)+'s'; c.appendChild(d);
-            }
-            setTimeout(()=>{c.innerHTML=''; c.style.display='none';}, 4000);
+        function loadCatEdit() {
+            var idx = document.getElementById('sel-cat').value;
+            if(!cats[idx]) return;
+            document.getElementById('v3-name').value = cats[idx].n;
+            document.getElementById('v3-key').value = cats[idx].k;
+            document.getElementById('v3-desc').value = cats[idx].d || "";
         }
 
-        function showWin() {
-            if(activeCat === 'custom') {
-                document.getElementById('win-img').src = customImageSrc;
-                document.getElementById('win-modal').classList.add('active');
-                addPoints(15);
+        // Ajouter une catégorie vide
+        function addCat() {
+            var newId = 'cat_' + new Date().getTime();
+            cats.push({
+                id: newId,
+                n: 'Nouvelle Catégorie',
+                k: 'nature', // Défaut
+                d: 'Description ici...'
+            });
+            refreshCatSelect();
+            // Sélectionner la nouvelle
+            document.getElementById('sel-cat').value = cats.length - 1;
+            loadCatEdit();
+        }
+
+        // Supprimer la catégorie sélectionnée
+        function delCat() {
+            var idx = document.getElementById('sel-cat').value;
+            if(cats[idx].id === 'custom') {
+                alert("Impossible de supprimer la catégorie 'Perso'. C'est une catégorie système.");
                 return;
             }
-            let lvl = gameDB[activeCat][currIdx];
-            document.getElementById('win-img').src = lvl.img;
-            document.getElementById('win-modal').classList.add('active');
-            addPoints(15);
-            let max = parseInt(localStorage.getItem('pz_'+activeCat)) || 0;
-            if(currIdx === max) localStorage.setItem('pz_'+activeCat, max+1);
-        }
-
-        function nextLvl() {
-            document.getElementById('win-modal').classList.remove('active');
-            if(activeCat === 'custom') { backToLibrary(); return; }
-            if(currIdx < 49) { currIdx++; showBriefing(false); } // Aller au briefing suivant
-            else backToLibrary();
-        }
-
-        // --- ADMIN & DATA ---
-        function setupSecretAdmin() {
-            const logo = document.getElementById('secret-logo');
-            logo.addEventListener('mousedown', () => { pressTimer = setTimeout(showLogin, 2000); });
-            logo.addEventListener('mouseup', () => clearTimeout(pressTimer));
-            logo.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-            logo.addEventListener('touchstart', () => { pressTimer = setTimeout(showLogin, 2000); });
-            logo.addEventListener('touchend', () => clearTimeout(pressTimer));
-        }
-        function showLogin() { document.getElementById('login-modal').classList.add('active'); document.getElementById('admin-pass').value = ''; }
-        function closeLogin() { document.getElementById('login-modal').classList.remove('active'); }
-        function checkPassword() { if(document.getElementById('admin-pass').value === "1234") { closeLogin(); openAdmin(); } else alert("Mot de passe incorrect"); }
-        function loadUserData() {
-            const savedScore = localStorage.getItem('pz_score');
-            userScore = savedScore ? parseInt(savedScore) : 0; if(isNaN(userScore)) userScore = 0; updateScoreUI();
-        }
-        function addPoints(pts) {
-            userScore += pts; localStorage.setItem('pz_score', userScore); updateScoreUI();
-            const b = document.getElementById('score-container'); b.classList.add('pop'); setTimeout(() => b.classList.remove('pop'), 300);
-        }
-        function updateScoreUI() { document.getElementById('score-display').innerText = userScore; }
-        function hardReset() { localStorage.clear(); location.reload(); }
-        function openAdmin() { document.getElementById('admin-panel').classList.add('open'); }
-        function closeAdmin() { document.getElementById('admin-panel').classList.remove('open'); }
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('admin-preview').src = e.target.result; reader.readAsDataURL(file); }
-        }
-        function saveAdminData() {
-            promoData = {
-                title: document.getElementById('admin-title').value || "Titre",
-                tag: document.getElementById('admin-tag').value || "Tag",
-                img: document.getElementById('admin-preview').src,
-                gameL1: document.getElementById('admin-game-l1').value,
-                gameL2: document.getElementById('admin-game-l2').value
-            };
-            localStorage.setItem('pz_promo_data', JSON.stringify(promoData)); updatePromoUI(); closeAdmin();
-        }
-        function loadAdminData() {
-            const saved = localStorage.getItem('pz_promo_data');
-            if(saved) {
-                try { const parsed = JSON.parse(saved); promoData = { ...promoData, ...parsed }; } catch(e) {}
-                document.getElementById('admin-title').value = promoData.title;
-                document.getElementById('admin-tag').value = promoData.tag;
-                document.getElementById('admin-preview').src = promoData.img;
-                if(document.getElementById('admin-game-l1')) document.getElementById('admin-game-l1').value = promoData.gameL1;
-                if(document.getElementById('admin-game-l2')) document.getElementById('admin-game-l2').value = promoData.gameL2;
+            if(confirm("Supprimer définitivement la catégorie : " + cats[idx].n + " ?")) {
+                cats.splice(idx, 1);
+                refreshCatSelect();
+                loadCatEdit();
             }
         }
-        function updatePromoUI() {
-            if(document.getElementById('promo-title')) {
-                document.getElementById('promo-title').innerText = promoData.title;
-                document.getElementById('promo-tag').innerText = promoData.tag;
-                document.getElementById('promo-img').src = promoData.img;
-                document.getElementById('game-ad-l1').innerText = promoData.gameL1;
-                document.getElementById('game-ad-l2').innerText = promoData.gameL2;
+
+        function applyCatUpdate() {
+            var idx = document.getElementById('sel-cat').value;
+            cats[idx].n = document.getElementById('v3-name').value;
+            cats[idx].k = document.getElementById('v3-key').value;
+            cats[idx].d = document.getElementById('v3-desc').value;
+            refreshCatSelect(); // Update le nom dans la liste
+            document.getElementById('sel-cat').value = idx; // Rester dessus
+            alert("Modifications appliquées (Pensez à sauvegarder !)");
+        }
+
+        function saveAll() {
+            ads.top.img = document.getElementById('v1-img').value;
+            ads.top.t = document.getElementById('v1-title').value;
+            ads.bot.icon = document.getElementById('v2-icon').value;
+            ads.bot.t = document.getElementById('v2-title').value;
+            ads.bot.s = document.getElementById('v2-sub').value;
+            
+            localStorage.setItem('pz_ads_v85', JSON.stringify(ads));
+            localStorage.setItem('pz_cats_v85', JSON.stringify(cats));
+            alert("Tout est sauvegardé !");
+            location.reload();
+        }
+
+        function resetFactory() {
+            if(confirm("Tout effacer et revenir à zéro ?")) {
+                localStorage.removeItem('pz_ads_v85');
+                localStorage.removeItem('pz_cats_v85');
+                location.reload();
             }
         }
     </script>
